@@ -1,36 +1,13 @@
-// lbs-test project main.go
 package main
 
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"lbs"
 	"log"
 	"net/http"
 	"strings"
 )
-
-func req_lbs(qcip string) string {
-	//http://lbsyun.baidu.com/index.php?title=webapi/high-acc-ip
-	http_client := &http.Client{}
-	req_url := "http://api.map.baidu.com/highacciploc/v1?qcip="
-	req_url += qcip
-	req_url += "&qterm=pc&extensions=3&ak=691877440e377e5896acad424ca64732&coord=bd09ll"
-
-	http_req, err := http.NewRequest("GET", req_url, nil)
-	http_req.Header.Add("Accept-Language", "zh-cn,zh;q=0.8,en-us;q=0.5,en;q=0.3")
-	http_req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0")
-	http_rsp, err := http_client.Do(http_req)
-
-	if err != nil {
-		return ""
-	}
-	defer http_rsp.Body.Close()
-
-	var body []byte
-	body, _ = ioutil.ReadAll(http_rsp.Body)
-	return string(body)
-}
 
 func get_lbs(w http.ResponseWriter, r *http.Request) {
 	var str_ip string
@@ -46,7 +23,7 @@ func get_lbs(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, ", location_ip:")
 	fmt.Fprintf(w, str_ip)
 	fmt.Fprintf(w, "},")
-	fmt.Fprintf(w, req_lbs(str_ip))
+	fmt.Fprintf(w, lbs.Req_lbs(str_ip))
 }
 
 func get_ip(w http.ResponseWriter, r *http.Request) {
@@ -60,17 +37,19 @@ func get_ip_port(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	str_port := flag.String("port", "9655", "9655 id default port")
+	i_port := flag.String("port", "9655", "default server port 9655")
+	i_tls := flag.Int("tls", 1, "default enable tls")
 	flag.Parse()
 
+	http.Handle("/", http.FileServer(http.Dir("./html/")))
 	http.HandleFunc("/ip", get_ip)
 	http.HandleFunc("/ip_port", get_ip_port)
 	http.HandleFunc("/lbs", get_lbs)
 
-	str_svr := ":" + *str_port
-	fmt.Println(str_svr)
-	err := http.ListenAndServe(str_svr, nil)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
+	if *i_tls == 1 {
+		log.Fatal(http.ListenAndServeTLS(":"+*i_port, "./ca/ca.crt", "./ca/ca.key", nil))
+	} else {
+		log.Fatal(http.ListenAndServe(":"+*i_port, nil))
 	}
+
 }
