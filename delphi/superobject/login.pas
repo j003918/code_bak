@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, DB, ADODB;
+  Dialogs, StdCtrls, DB, ADODB,main;
 
 type
   TfrmLogin = class(TForm)
@@ -63,7 +63,10 @@ begin
   end;
 
   if adoquery1.RecordCount=1 then
-    Close
+  begin
+    frmMain.m_login_user := txtUserName.Text;
+    Close;
+  end
   else
     begin
       MessageBox(frmlogin.Handle,'用户名或密码错误','提示',MB_ICONHAND+MB_Ok);

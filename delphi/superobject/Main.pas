@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls,SOAPHTTPClient, iparkservice,superobject,TPEAPI;
+  Dialogs, StdCtrls,SOAPHTTPClient, iparkservice,superobject,TPEAPI, DB,
+  ADODB,winsock;
 
 type
   TfrmMain = class(TForm)
@@ -25,16 +26,20 @@ type
     edit_name: TEdit;
     edit_Condition: TEdit;
     edit_balance: TEdit;
+    ADOQuery1: TADOQuery;
     procedure btnWSQueryClick(Sender: TObject);
     procedure btnWSCostClick(Sender: TObject);
     procedure btnTPEQueryClick(Sender: TObject);
     procedure btnTPECostClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
-//    procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
+    //-->
+  function oprator_log(oprator_name,oprator_type,account,money,rst:String):Boolean;
+//<--
   public
     { Public declarations }
+    m_login_user : String;
   end;
 
 var
@@ -62,6 +67,8 @@ function GetSn():integer;
 function WLCallBack ( pRec: PtagWhiteListCallBack  ):integer;stdcall;
 
 implementation
+
+uses login;
 
 {$R *.dfm}
 
@@ -105,7 +112,32 @@ begin
             p[i] := buf[i+1];
 end;
 
-
+function LocalIP : string;
+type
+TaPInAddr = array [0..10] of PInAddr;
+PaPInAddr = ^TaPInAddr;
+var
+phe : PHostEnt;
+pptr : PaPInAddr; 
+Buffer : array [0..63] of char;
+I : Integer;
+GInitData : TWSADATA;
+begin
+WSAStartup($101, GInitData);
+Result := ' ';
+GetHostName(Buffer, SizeOf(Buffer));
+phe :=GetHostByName(buffer);
+if phe = nil then Exit;
+pptr := PaPInAddr(Phe^.h_addr_list);
+I := 0;
+while pptr^[I] <> nil do begin
+if i=0
+then result:=StrPas(inet_ntoa(pptr^[I]^))
+else result:=result+ ', '+StrPas(inet_ntoa(pptr^[I]^));
+Inc(I);
+end;
+WSACleanup;
+end;
 
 function GetSn():integer;
 var
@@ -162,9 +194,9 @@ begin
   edit_Condition.Text := '';
   edit_name.Text := '';
 
+   
   str_RST := server.TPE_GetAccount('12',edit_account.text,'',str_MAC);
   //memo1.Text := str_RST;
-
 
   jo := TSuperObject.ParseString(pwidechar(str_RST),true);
   if jo['Result'].AsString = 'ok' then
@@ -179,6 +211,7 @@ begin
     edit_balance.Text := str_RST
 end;
 
+
 procedure TfrmMain.btnWSCostClick(Sender: TObject);
 var
   Server:IParkServiceSoap;
@@ -191,10 +224,20 @@ begin
   str_RST := server.TPE_FlowCost('12',edit_account.text,'',intToStr(Trunc(strToFloat(edit_money.Text)*-10000)),str_MAC);
   jo := TSuperObject.ParseString(pwidechar(str_RST),true);
 
+
+
   if jo['Result'].AsString = 'ok' then
-    showMessage('消费成功')
+  begin
+    showMessage('消费成功');
+    oprator_log(m_login_user,'WebService',edit_account.text,edit_money.Text,'0');
+  end
   else
+  begin
     showMessage('消费失败');
+    oprator_log(m_login_user,'WebService',edit_account.text,edit_money.Text,'1');
+  end;
+
+
 
 end;
 
@@ -257,6 +300,11 @@ begin
 
 		    nRet := TPE_FlowCost( 1 , @Req , 1 , @Res , 1 );
 
+        if nRet = 0 then
+          oprator_log(m_login_user,'TPE',edit_account.text,edit_money.Text,'0')
+        else
+          oprator_log(m_login_user,'TPE',edit_account.text,edit_money.Text,'1');
+
 		    ShowMsg( 'TPE_FlowCost ret :%d , %d' ,[ nRet , Res.RecordError]);
 end;
 
@@ -270,5 +318,41 @@ begin
 	TPE_StartWLNotify();
   m_List := TList.Create;
 end;
+
+function TfrmMain.oprator_log(oprator_name,oprator_type,account,money,rst:String):Boolean;
+var
+  strConn : string;
+  exec_count : Integer;
+begin
+  strConn := 'Provider=SQLOLEDB.1;Password=sesan;Persist Security Info=True;User ID=sesan;Initial Catalog=ConCard;Data Source=130.1.10.243';
+  exec_count := 0;
+
+  try
+    ADOQuery1.Close;
+    ADOQuery1.ConnectionString := strConn;
+    ADOQuery1.SQL.Clear;
+    ADOQuery1.ParamCheck:=True;
+    ADOQuery1.Parameters.Clear;
+
+    ADOQuery1.SQL.Text:='insert into concard.sesan.oprator_log(oprator_name,ip_addr,oprator_type,user_accountno,money,result) values(:oprator_name,:ip_addr,:oprator_type,:user_accountno,:money,:result)';
+    ADOQuery1.Parameters.ParamByName('oprator_name').Value:=m_login_user;
+    ADOQuery1.Parameters.ParamByName('ip_addr').Value:= LocalIP;
+    ADOQuery1.Parameters.ParamByName('oprator_type').Value:=oprator_type;
+    ADOQuery1.Parameters.ParamByName('user_accountno').Value:=account;
+    ADOQuery1.Parameters.ParamByName('money').Value:=money;
+    ADOQuery1.Parameters.ParamByName('result').Value:=rst;
+    exec_count := ADOQuery1.ExecSQL;
+  except
+    on E: Exception do
+    begin
+      Result := false;
+      MessageBox(frmlogin.Handle,PAnsiChar(E.Message),'提示',MB_ICONHAND+MB_Ok);
+    end;
+  end;
+
+  if exec_count = 1 then
+    Result := true;
+end;
+
 
 end.

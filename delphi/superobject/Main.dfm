@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 237
-  Top = 136
+  Left = 410
+  Top = 231
   Width = 412
   Height = 281
   BorderStyle = bsSizeToolWin
@@ -166,5 +166,10 @@ object frmMain: TfrmMain
       Enabled = False
       TabOrder = 9
     end
+  end
+  object ADOQuery1: TADOQuery
+    Parameters = <>
+    Left = 322
+    Top = 121
   end
 end
