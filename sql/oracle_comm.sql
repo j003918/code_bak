@@ -1,3 +1,7 @@
+--强制主机并行
+select /*+ monitor parallel(16)*/ count(*),sum(charges) from OUTP_BILL_ITEMS; 
+
+
 CREATE OR REPLACE FUNCTION PARSE_FEE_CHINESE(N_FEE IN NUMBER) 
 RETURN VARCHAR2 AS
   V_CHINESE_NUMBER VARCHAR2(30)  := '零壹贰叁肆伍陆柒捌玖';
