@@ -17,14 +17,17 @@ Public Function insert_sql(tbname As String, btrim As Boolean, ParamArray col())
     col_names = col(0)
     col_types = col(1)
     col_vals = col(2)
-    
-   
+       
     Dim col_nums, i As Integer
     i = 0
     col_nums = 0
 
     For Each col_name In col_names
-        str_tmp = str_tmp & "," & Trim(col_name)
+        If Trim(col_name) = "" Then
+            str_tmp = str_tmp
+        Else
+            str_tmp = str_tmp & "," & Trim(col_name)
+        End If
         col_nums = col_nums + 1
     Next
     str_tmp = str_tmp & ") values ("
@@ -36,7 +39,7 @@ Public Function insert_sql(tbname As String, btrim As Boolean, ParamArray col())
     ReDim Arr(col_nums + 1)
     
     For Each col_type In col_types
-        Arr(i) = col_type
+        Arr(i) = Trim(col_type)
         i = i + 1
     Next
     
@@ -44,6 +47,8 @@ Public Function insert_sql(tbname As String, btrim As Boolean, ParamArray col())
     For Each col_val In col_vals
         If Arr(i) = "str" Then
             str_tmp = str_tmp & "," & j_sqlstr(col_val, btrim)
+        ElseIf Arr(i) = "" Then
+            str_tmp = str_tmp
         Else
             str_tmp = str_tmp & "," & Trim(col_val)
         End If
@@ -52,3 +57,4 @@ Public Function insert_sql(tbname As String, btrim As Boolean, ParamArray col())
        
     insert_sql = insert_sql & Mid(str_tmp, 2) & ");"
 End Function
+
