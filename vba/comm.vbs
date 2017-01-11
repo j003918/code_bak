@@ -1,3 +1,6 @@
+'扣税 A2为去除五险一金后的工资所得
+'=ROUND(MAX(A2*{0.03,0.1,0.2,0.25,0.3,0.35,0.45}-{0,105,555,1005,2755,5505,13505},0),2)
+
 Public Function j_sqlstr(str, btrim As Boolean)
     If btrim = False Then
         j_sqlstr = "'" & str & "'"
