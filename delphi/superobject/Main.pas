@@ -221,7 +221,8 @@ var
 begin
   str_MAC := 'Synj0nes$'+edit_account.text+'$'+intToStr(Trunc(strToFloat(edit_money.Text)*-10000))+'$senOjnyS';
   Server  := GetIParkServiceSoap(true,'',nil);
-  str_RST := server.TPE_FlowCost('12',edit_account.text,'',intToStr(Trunc(strToFloat(edit_money.Text)*-10000)),str_MAC);
+  //StrToInt(formatFloat('0.00', StrToFloat(edit_money.Text)*-10000));
+  str_RST := server.TPE_FlowCost('12',edit_account.text,'',IntToStr(trunc(strtofloat(formatFloat('0.00', StrToFloat(edit_money.Text)*-10000)))),str_MAC);
   jo := TSuperObject.ParseString(pwidechar(str_RST),true);
 
 
@@ -292,8 +293,8 @@ begin
         Req.CostType := 11;
         Req.AccountNo:= 0;
         req.CardNo := StrToInt( edit_cardno.Text );
-
-        Req.TransMoney := Trunc(strToFloat(edit_money.Text)*-10000);
+       //Req.TransMoney := StrToInt(formatFloat('0.00', StrToFloat(edit_money.Text)*-10000));
+        Req.TransMoney := trunc(strtofloat(formatFloat('0.00', StrToFloat(edit_money.Text)*-10000)));
 
         Inc(LocalSn);
         Req.OccurIdNo :=  LocalSn ;
@@ -326,6 +327,8 @@ var
 begin
   strConn := 'Provider=SQLOLEDB.1;Password=sesan;Persist Security Info=True;User ID=sesan;Initial Catalog=ConCard;Data Source=130.1.10.243';
   exec_count := 0;
+
+  Result := false;
 
   try
     ADOQuery1.Close;
