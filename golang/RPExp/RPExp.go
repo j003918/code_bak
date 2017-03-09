@@ -109,8 +109,8 @@ func Parse_exp(exp string) string {
 	}
 
 	for e := list_exp.Front(); e != nil; e = e.Next() {
-		rp_exp += e.Value.(string) + ","
+		rp_exp += e.Value.(string) // + ","
 	}
 
-	return rp_exp
+	return rp_exp //[:len(rp_exp)-1]
 }
