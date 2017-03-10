@@ -1,51 +1,5 @@
-// RPN project RPN.go
-package RPN
-
-import (
-	"container/list"
-)
-
-type Stack struct {
-	l *list.List
-}
-
-func NewStack() *Stack {
-	l := list.New()
-	return &Stack{l}
-}
-
-func (s *Stack) List() *list.List {
-	return s.l
-}
-
-func (s *Stack) Empty() bool {
-	return s.l.Len() == 0
-}
-
-func (s *Stack) Len() int {
-	return s.l.Len()
-}
-
-func (s *Stack) Top() interface{} {
-	e := s.l.Back()
-	if e != nil {
-		return e.Value
-	}
-	return nil
-}
-
-func (s *Stack) Pop() interface{} {
-	e := s.l.Back()
-	if e != nil {
-		s.l.Remove(e)
-		return e.Value
-	}
-	return nil
-}
-
-func (s *Stack) Push(v interface{}) {
-	s.l.PushBack(v)
-}
+// comm project rpn.go
+package comm
 
 func opr_level(opr string) int {
 	switch opr {
@@ -59,14 +13,12 @@ func opr_level(opr string) int {
 		return 2
 	case "(":
 		fallthrough
-	case ")":
-		fallthrough
 	default:
 		return 0
 	}
 }
 
-func Parse_Exp(expression string) string {
+func Get_RPN(expression string, split string) string {
 	str_rpn := ""
 	str_tmp := ""
 	ch := ""
@@ -132,8 +84,8 @@ func Parse_Exp(expression string) string {
 	}
 
 	for e := rpn.List().Front(); e != nil; e = e.Next() {
-		str_rpn += e.Value.(string) // + ","
+		str_rpn += e.Value.(string) + split
 	}
 
-	return str_rpn //[:len(rp_exp)-1]
+	return str_rpn[:len(str_rpn)-len(split)]
 }
