@@ -46,3 +46,9 @@ func (s *Stack) Pop() interface{} {
 func (s *Stack) Push(v interface{}) {
 	s.l.PushBack(v)
 }
+
+func (s *Stack) Clean() {
+	for e := s.l.Front(); e != nil; e = e.Next() {
+		s.l.Remove(e)
+	}
+}

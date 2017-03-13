@@ -10,6 +10,8 @@ func opr_level(opr string) int {
 	case "*":
 		fallthrough
 	case "/":
+		fallthrough
+	case "%":
 		return 2
 	case "(":
 		fallthrough
@@ -57,6 +59,8 @@ func Get_RPN(expression string, split string) string {
 			fallthrough
 		case "*":
 			fallthrough
+		case "%":
+			fallthrough
 		case "/":
 			if str_tmp != "" {
 				rpn.Push(str_tmp)
@@ -86,6 +90,9 @@ func Get_RPN(expression string, split string) string {
 	for e := rpn.List().Front(); e != nil; e = e.Next() {
 		str_rpn += e.Value.(string) + split
 	}
+
+	opr.Clean()
+	rpn.Clean()
 
 	return str_rpn[:len(str_rpn)-len(split)]
 }
