@@ -73,6 +73,8 @@ end;
 
 procedure TfrmMain.Button1Click(Sender: TObject);
 begin
+  trayicon1.BalloonHint := '发现三例，请处理';
+  trayicon1.BalloonTitle := '危急值';
   SetTrayFlash(true);
 end;
 
