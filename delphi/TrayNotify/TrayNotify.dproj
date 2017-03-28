@@ -52,6 +52,14 @@
 			<DCCReference Include="Splash.pas">
 				<Form>frmSplash</Form>
 			</DCCReference>
+			<RcItem Include="1_48px.ico">
+				<ResourceType>Icon</ResourceType>
+				<ResourceId>Icon_1</ResourceId>
+			</RcItem>
+			<RcItem Include="2_48px.ico">
+				<ResourceType>Icon</ResourceType>
+				<ResourceId>Icon_2</ResourceId>
+			</RcItem>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
