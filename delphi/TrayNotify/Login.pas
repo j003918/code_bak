@@ -4,19 +4,21 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls;
+  Dialogs, StdCtrls, ExtCtrls;
 
 type
   TfrmLogin = class(TForm)
-    Edit1: TEdit;
-    Edit2: TEdit;
-    btn_login: TButton;
-    Button2: TButton;
+    Panel1: TPanel;
     Label1: TLabel;
+    Edit1: TEdit;
     Label2: TLabel;
+    Edit2: TEdit;
+    Button2: TButton;
+    Button4: TButton;
     procedure btn_loginClick(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -54,6 +56,11 @@ procedure TfrmLogin.Button2Click(Sender: TObject);
 begin
   Self.ModalResult := mrCancel;
   Exit;
+end;
+
+procedure TfrmLogin.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+   // Self.ModalResult := mrCancel;
 end;
 
 procedure TfrmLogin.FormCreate(Sender: TObject);

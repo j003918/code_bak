@@ -3,7 +3,7 @@
 			<ProjectGuid>{1EABD4C9-E756-44DE-A129-D4804CA2B3A5}</ProjectGuid>
 			<ProjectVersion>12.0</ProjectVersion>
 			<MainSource>TrayNotify.dpr</MainSource>
-			<Config Condition="'$(Config)'==''">Debug</Config>
+			<Config Condition="'$(Config)'==''">Release</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -20,6 +20,7 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_UsePackage>vcl;rtl;vclx;vclimg;vclactnband;dbrtl;vcldb;vcldbx;bdertl;vcltouch;xmlrtl;dsnap;dsnapcon;TeeUI;TeeDB;Tee;vclib;ibxpress;adortl;IndyCore;IndySystem;IndyProtocols;inet;intrawebdb_100_140;Intraweb_100_140;VclSmp;vclie;websnap;webdsnap;inetdb;inetdbbde;inetdbxpress;soaprtl;vclribbon;dbexpress;DbxCommonDriver;DataSnapIndy10ServerTransport;DataSnapProviderClient;DbxClientDriver;DataSnapServer;DBXInterBaseDriver;DBXMySQLDriver;dbxcds;DBXFirebirdDriver;DBXSybaseASEDriver;DBXSybaseASADriver;DBXOracleDriver;DBXMSSQLDriver;DBXInformixDriver;DBXDb2Driver;unidacvcl140;unidac140;dacvcl140;dac140;crcontrols140;vquery140</DCC_UsePackage>
 			<DCC_DependencyCheckOutputName>TrayNotify.exe</DCC_DependencyCheckOutputName>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
@@ -43,23 +44,15 @@
 			<DelphiCompile Include="TrayNotify.dpr">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
-			<DCCReference Include="Main.pas">
-				<Form>frmMain</Form>
-			</DCCReference>
 			<DCCReference Include="Login.pas">
 				<Form>frmLogin</Form>
 			</DCCReference>
 			<DCCReference Include="Splash.pas">
 				<Form>frmSplash</Form>
 			</DCCReference>
-			<RcItem Include="1_48px.ico">
-				<ResourceType>Icon</ResourceType>
-				<ResourceId>Icon_1</ResourceId>
-			</RcItem>
-			<RcItem Include="2_48px.ico">
-				<ResourceType>Icon</ResourceType>
-				<ResourceId>Icon_2</ResourceId>
-			</RcItem>
+			<DCCReference Include="Main.pas">
+				<Form>frmMain</Form>
+			</DCCReference>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
@@ -113,6 +106,10 @@
 						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
+					<Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\dcloffice2k140.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\bin\dclofficexp140.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+					</Excluded_Packages>
 				</Delphi.Personality>
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>

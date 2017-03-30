@@ -4,28 +4,28 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ImgList, Menus, ExtCtrls, StdCtrls;
+  Dialogs, Menus, ImgList, ExtCtrls, StdCtrls;
 
 type
   TfrmMain = class(TForm)
     TrayIcon1: TTrayIcon;
-    PopupMenu1: TPopupMenu;
     ImageList1: TImageList;
+    PopupMenu1: TPopupMenu;
     N1: TMenuItem;
     Button1: TButton;
     Button2: TButton;
-    procedure N1Click(Sender: TObject);
+    procedure TrayIcon1Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
-    procedure FormShow(Sender: TObject);
-    procedure TrayIcon1Click(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormShow(Sender: TObject);
+    procedure N1Click(Sender: TObject);
   private
+    { Private declarations }
     procedure WMSysCommand(var Msg: TWMSysCommand); message WM_SYSCOMMAND;
     procedure SetTrayFlash(IsFlash : Boolean);
     procedure HideToTray;
     procedure ShowToDesktop;
-    { Private declarations }
   public
     { Public declarations }
   end;
@@ -37,11 +37,45 @@ implementation
 
 {$R *.dfm}
 
+
+procedure TfrmMain.Button1Click(Sender: TObject);
+begin
+  trayicon1.BalloonHint := '有人找';
+  trayicon1.BalloonTitle := '标题';
+  SetTrayFlash(true);
+end;
+
+procedure TfrmMain.Button2Click(Sender: TObject);
+begin
+  SetTrayFlash(false)
+end;
+
+procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  HideToTray;
+  CanClose:=False;
+end;
+
+procedure TfrmMain.FormShow(Sender: TObject);
+var
+Style: Integer;
+begin
+Style := GetWindowLong(Handle, GWL_EXSTYLE);
+SetWindowLong(Handle, GWL_EXSTYLE, Style and (not WS_EX_APPWINDOW));
+ShowWindow(Application.Handle, SW_HIDE);
+end;
+
 procedure TfrmMain.HideToTray;
 begin
     Application.Minimize;
     ShowWindow(Application.Handle, SW_HIDE);
 end;
+
+procedure TfrmMain.N1Click(Sender: TObject);
+begin
+application.Terminate
+end;
+
 procedure TfrmMain.ShowToDesktop;
 begin
     ShowWindow(Application.Handle, SW_RESTORE);
@@ -69,38 +103,6 @@ end;
 procedure TfrmMain.TrayIcon1Click(Sender: TObject);
 begin
   ShowToDesktop;
-end;
-
-procedure TfrmMain.Button1Click(Sender: TObject);
-begin
-  trayicon1.BalloonHint := '发现三例，请处理';
-  trayicon1.BalloonTitle := '危急值';
-  SetTrayFlash(true);
-end;
-
-procedure TfrmMain.Button2Click(Sender: TObject);
-begin
-      SetTrayFlash(false)
-end;
-
-procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-begin
-  HideToTray;
-  CanClose:=False;
-end;
-
-procedure TfrmMain.FormShow(Sender: TObject);
-var
-Style: Integer;
-begin
-Style := GetWindowLong(Handle, GWL_EXSTYLE);
-SetWindowLong(Handle, GWL_EXSTYLE, Style and (not WS_EX_APPWINDOW));
-ShowWindow(Application.Handle, SW_HIDE);
-end;
-
-procedure TfrmMain.N1Click(Sender: TObject);
-begin
-  application.Terminate
 end;
 
 end.
