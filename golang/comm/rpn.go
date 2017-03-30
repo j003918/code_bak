@@ -3,15 +3,9 @@ package comm
 
 func opr_level(opr string) int {
 	switch opr {
-	case "+":
-		fallthrough
-	case "-":
+	case "+", "-":
 		return 1
-	case "*":
-		fallthrough
-	case "/":
-		fallthrough
-	case "%":
+	case "*", "/", "%":
 		return 2
 	case "(":
 		fallthrough
@@ -53,15 +47,7 @@ func Get_RPN(expression string, split string) string {
 				}
 				rpn.Push(str)
 			}
-		case "+":
-			fallthrough
-		case "-":
-			fallthrough
-		case "*":
-			fallthrough
-		case "%":
-			fallthrough
-		case "/":
+		case "+", "-", "*", "%", "/":
 			if str_tmp != "" {
 				rpn.Push(str_tmp)
 				str_tmp = ""
