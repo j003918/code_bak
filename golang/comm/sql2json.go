@@ -26,8 +26,10 @@ func Sql2Json(db *sql.DB, strSql string) (string, error) {
 		colKeys[i] = &colVals[i]
 	}
 
-	strJson := "["
+	fmt.Println(colKeys)
+	fmt.Println(colVals)
 
+	strJson := "["
 	for rows.Next() {
 		err = rows.Scan(colKeys...)
 		if err != nil {
@@ -52,11 +54,9 @@ func Sql2Json(db *sql.DB, strSql string) (string, error) {
 		row = row[0 : len(row)-1]
 		row += "}"
 		strJson = strJson + row + ","
-
 	}
 	strJson = strJson[0 : len(strJson)-1]
 	strJson += "]"
 
 	return strJson, nil
-	//fmt.Println(list)
 }
