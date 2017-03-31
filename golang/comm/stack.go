@@ -48,7 +48,10 @@ func (s *Stack) Push(v interface{}) {
 }
 
 func (s *Stack) Clean() {
-	for e := s.l.Front(); e != nil; e = e.Next() {
+	//add "n" for modify list.remove bug??
+	var n *list.Element
+	for e := s.l.Front(); e != nil; e = n {
+		n = e.Next()
 		s.l.Remove(e)
 	}
 }

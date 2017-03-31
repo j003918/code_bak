@@ -26,9 +26,6 @@ func Sql2Json(db *sql.DB, strSql string) (string, error) {
 		colKeys[i] = &colVals[i]
 	}
 
-	fmt.Println(colKeys)
-	fmt.Println(colVals)
-
 	strJson := "["
 	for rows.Next() {
 		err = rows.Scan(colKeys...)

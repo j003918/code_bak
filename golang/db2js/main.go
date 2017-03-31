@@ -29,21 +29,6 @@ func init() {
 	}
 }
 
-func getdept(w http.ResponseWriter, r *http.Request) {
-	val, _ := comm.Sql2Json(db, "select * from v_jhf_dept")
-	w.Write([]byte(val))
-}
-
-func getuser(w http.ResponseWriter, r *http.Request) {
-	val, _ := comm.Sql2Json(db, "select a.username,a.userid,a.fullname,a.depid,b.depname from app_user a left join oa0618.department b on a.depid=b.depid")
-	w.Write([]byte(val))
-}
-
-func getfee(w http.ResponseWriter, r *http.Request) {
-	val, _ := comm.Sql2Json(db, "select name,id from reimbursement_fee_type;")
-	w.Write([]byte(val))
-}
-
 func main() {
 	tls := flag.Int("tls", 0, "0 disable tls 1 enable tls")
 	port := flag.Int("port", 9653, "default server port 9653")
@@ -53,9 +38,9 @@ func main() {
 	defer db.Close()
 
 	http.Handle("/", http.FileServer(http.Dir("./html/")))
-	http.HandleFunc("/getdept", getdept)
-	http.HandleFunc("/getuser", getuser)
-	http.HandleFunc("/getfee", getfee)
+	http.HandleFunc("/get_dept", get_dept)
+	http.HandleFunc("/get_user", get_user)
+	http.HandleFunc("/get_fee", get_fee)
 
 	var err error
 	if *tls == 1 {
@@ -64,8 +49,22 @@ func main() {
 		err = http.ListenAndServe(listen_addr, nil)
 	}
 
-	//err := http.ListenAndServe(":9090", nil)
 	if err != nil {
 		panic(err.Error())
 	}
+}
+
+func get_dept(w http.ResponseWriter, r *http.Request) {
+	val, _ := comm.Sql2Json(db, "select * from v_jhf_dept")
+	w.Write([]byte(val))
+}
+
+func get_user(w http.ResponseWriter, r *http.Request) {
+	val, _ := comm.Sql2Json(db, "select a.username,a.userid,a.fullname,a.depid,b.depname from app_user a left join oa0618.department b on a.depid=b.depid")
+	w.Write([]byte(val))
+}
+
+func get_fee(w http.ResponseWriter, r *http.Request) {
+	val, _ := comm.Sql2Json(db, "select name,id from reimbursement_fee_type;")
+	w.Write([]byte(val))
 }
