@@ -21,7 +21,6 @@ var ds_sql map[string]string
 
 func iner_init(strconn string) {
 	var err error
-	//db_mysql, err = sql.Open("mysql", "root:root@tcp(172.25.125.101:3306)/oa0618?charset=utf8")
 	db_mysql, err = sql.Open("mysql", strconn)
 	if err != nil {
 		panic(err.Error())
