@@ -18,12 +18,12 @@ func Sql2Json(db *sql.DB, strSql string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer rows.Close()
 
 	columns, err := rows.Columns()
 	if err != nil {
 		return "", err
 	}
-	defer rows.Close()
 
 	colVals := make([]sql.RawBytes, len(columns))
 	colKeys := make([]interface{}, len(colVals))
@@ -33,7 +33,6 @@ func Sql2Json(db *sql.DB, strSql string) (string, error) {
 	}
 
 	strJson := "["
-	//strJson := `{"result":0,"msg":"ok","ds":[`
 	for rows.Next() {
 		err = rows.Scan(colKeys...)
 		if err != nil {
@@ -45,7 +44,7 @@ func Sql2Json(db *sql.DB, strSql string) (string, error) {
 		var strVal string
 		for i, col := range colVals {
 			if col == nil {
-				strVal = "NULL"
+				strVal = "null"
 			} else {
 				strVal = string(col)
 			}
@@ -61,7 +60,6 @@ func Sql2Json(db *sql.DB, strSql string) (string, error) {
 	}
 	strJson = strJson[0 : len(strJson)-1]
 	strJson += "]"
-	//strJson += "]}"
 
 	return strJson, nil
 }
