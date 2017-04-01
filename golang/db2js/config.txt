@@ -1,0 +1,4 @@
+get_db1^select * from v_jhf_dept
+get_db2^select * from v_jhf_dept
+get_fee^select name,id from reimbursement_fee_type
+get_db3^select * from v_jhf_dept

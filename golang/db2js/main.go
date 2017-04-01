@@ -2,45 +2,91 @@
 package main
 
 import (
+	"bufio"
 	"comm"
 	"database/sql"
 	"flag"
+	"fmt"
 	"net/http"
+	"os"
 	"strconv"
+	"strings"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var db *sql.DB
+var db_mysql *sql.DB
+var ds_sql map[string]string
 
 func init() {
 	var err error
-	db, err = sql.Open("mysql", "root:root@tcp(172.25.125.101:3306)/oa0618?charset=utf8")
+	db_mysql, err = sql.Open("mysql", "root:root@tcp(172.25.125.101:3306)/oa0618?charset=utf8")
 	if err != nil {
 		panic(err.Error())
 	}
 
-	db.SetMaxOpenConns(200)
-	db.SetMaxIdleConns(100)
+	ds_sql = make(map[string]string)
+	loadconfig()
 
-	err = db.Ping()
+	db_mysql.SetMaxOpenConns(200)
+	db_mysql.SetMaxIdleConns(100)
+
+	err = db_mysql.Ping()
 	if err != nil {
 		panic(err.Error())
 	}
 }
 
+func timer1() {
+	timer1 := time.NewTicker(30 * time.Second)
+	for {
+		select {
+		case <-timer1.C:
+			loadconfig()
+		}
+	}
+}
+
+func loadconfig() {
+	f, err := os.Open("config.txt")
+	if err != nil {
+		return
+	}
+	defer f.Close()
+
+	buf := bufio.NewReader(f)
+	for {
+		line, err := buf.ReadString('\n')
+		line = strings.TrimSpace(line)
+		kv := strings.Split(line, "^")
+		if _, ok := ds_sql[kv[0]]; len(kv) == 2 && false == ok {
+			ds_sql[kv[0]] = kv[1]
+			fmt.Println("load cmd:", kv[0], "exec_sql:", kv[1])
+		}
+
+		if err != nil {
+			break
+		}
+	}
+}
+
 func main() {
 	tls := flag.Int("tls", 0, "0 disable tls 1 enable tls")
-	port := flag.Int("port", 9653, "default server port 9653")
+	port := flag.Int("port", 80, "default port http:80 https:443")
 	flag.Parse()
-	listen_addr := ":" + strconv.Itoa(*port)
+	listen_addr := ":"
+	if 80 == *port && 1 == *tls {
+		listen_addr += "443"
+	} else {
+		listen_addr += strconv.Itoa(*port)
+	}
 
-	defer db.Close()
+	defer db_mysql.Close()
+	go timer1()
 
 	http.Handle("/", http.FileServer(http.Dir("./html/")))
-	http.HandleFunc("/get_dept", get_dept)
-	http.HandleFunc("/get_user", get_user)
-	http.HandleFunc("/get_fee", get_fee)
+	http.HandleFunc("/do", ds)
 
 	var err error
 	if *tls == 1 {
@@ -54,17 +100,23 @@ func main() {
 	}
 }
 
-func get_dept(w http.ResponseWriter, r *http.Request) {
-	val, _ := comm.Sql2Json(db, "select * from v_jhf_dept")
-	w.Write([]byte(val))
-}
+func ds(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
 
-func get_user(w http.ResponseWriter, r *http.Request) {
-	val, _ := comm.Sql2Json(db, "select a.username,a.userid,a.fullname,a.depid,b.depname from app_user a left join oa0618.department b on a.depid=b.depid")
-	w.Write([]byte(val))
-}
+	strRst := ""
+	strMsg := ""
+	strVal, err := comm.Sql2Json(db_mysql, ds_sql[r.Form.Get("cmd")])
+	if nil != err {
+		strRst = "-1"
+		strMsg = err.Error()
+		strVal = "null"
+	} else {
+		strRst = "0"
+		strMsg = "ok"
+	}
+	strJson := `{"result":` + strRst + ","
+	strJson += `"msg":"` + strMsg + `",`
+	strJson += `"data":` + strVal + "}"
 
-func get_fee(w http.ResponseWriter, r *http.Request) {
-	val, _ := comm.Sql2Json(db, "select name,id from reimbursement_fee_type;")
-	w.Write([]byte(val))
+	w.Write([]byte(strJson))
 }
