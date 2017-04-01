@@ -75,7 +75,7 @@ func main() {
 	tls := flag.Int("tls", 0, "0 disable tls 1 enable tls")
 	port := flag.Int("port", 80, "default port http:80 https:443")
 
-	str_DBHost := flag.String("dbhost", "127.0.0.1", "default host 127.0.0.1")
+	str_DBHost := flag.String("dbhost", "130.1.10.230", "default host 127.0.0.1")
 	str_DBPort := flag.String("dbport", "3306", "default port 3306")
 	str_DBUser := flag.String("dbuser", "root", "default user root")
 	str_DBPass := flag.String("dbpass", "root", "default pass root")
@@ -115,12 +115,18 @@ func main() {
 	}
 }
 
+//url http://127.0.0.1/do?cmd=getdb1&param="a":"3","b":"4"
 func ds(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
 	strRst := ""
 	strMsg := ""
-	strVal, err := comm.Sql2Json(db_mysql, ds_sql[r.Form.Get("cmd")])
+
+	strCmd := r.Form.Get("cmd")
+	strPar := r.Form.Get("param")
+
+	strSql := ds_sql[strCmd]
+	strVal, err := comm.Sql2Json(db_mysql, strSql)
 	if nil != err {
 		strRst = "-1"
 		strMsg = err.Error()
@@ -132,6 +138,7 @@ func ds(w http.ResponseWriter, r *http.Request) {
 	strJson := `{"result":` + strRst + ","
 	strJson += `"msg":"` + strMsg + `",`
 	strJson += `"data":` + strVal + "}"
-
+	w.Write([]byte(strPar))
 	w.Write([]byte(strJson))
+
 }
