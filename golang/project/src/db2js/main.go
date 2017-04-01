@@ -19,9 +19,10 @@ import (
 var db_mysql *sql.DB
 var ds_sql map[string]string
 
-func init() {
+func iner_init(strconn string) {
 	var err error
-	db_mysql, err = sql.Open("mysql", "root:root@tcp(172.25.125.101:3306)/oa0618?charset=utf8")
+	//db_mysql, err = sql.Open("mysql", "root:root@tcp(172.25.125.101:3306)/oa0618?charset=utf8")
+	db_mysql, err = sql.Open("mysql", strconn)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -74,7 +75,22 @@ func loadconfig() {
 func main() {
 	tls := flag.Int("tls", 0, "0 disable tls 1 enable tls")
 	port := flag.Int("port", 80, "default port http:80 https:443")
+
+	str_DBHost := flag.String("dbhost", "127.0.0.1", "default host 127.0.0.1")
+	str_DBPort := flag.String("dbport", "3306", "default port 3306")
+	str_DBUser := flag.String("dbuser", "root", "default user root")
+	str_DBPass := flag.String("dbpass", "root", "default pass root")
+	str_DBName := flag.String("dbname", "mysql", "default dbname mysql")
+	str_DBCharset := flag.String("dbcharset", "utf8", "default charset utf8")
 	flag.Parse()
+
+	str_conn := *str_DBUser + ":" + *str_DBPass
+	str_conn += "@tcp(" + *str_DBHost + ":" + *str_DBPort + ")/"
+	str_conn += *str_DBName + "?charset=" + *str_DBCharset
+
+	fmt.Println(str_conn)
+	iner_init(str_conn)
+
 	listen_addr := ":"
 	if 80 == *port && 1 == *tls {
 		listen_addr += "443"
