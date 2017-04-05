@@ -2,6 +2,7 @@
 package comm
 
 import (
+	"bytes"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 )
 
 func Sql2Json(db *sql.DB, strSql string) (string, error) {
+	var json_buf bytes.Buffer
 
 	if "" == strings.Trim(strSql, " ") {
 		return "", errors.New("err msg")
@@ -32,7 +34,8 @@ func Sql2Json(db *sql.DB, strSql string) (string, error) {
 		colKeys[i] = &colVals[i]
 	}
 
-	strJson := "["
+	json_buf.WriteString("[")
+	//strJson := "["
 	for rows.Next() {
 		err = rows.Scan(colKeys...)
 		if err != nil {
@@ -56,8 +59,11 @@ func Sql2Json(db *sql.DB, strSql string) (string, error) {
 		}
 		row = row[0 : len(row)-1]
 		row += "}"
-		strJson = strJson + row + ","
+		//strJson = strJson + row + ","
+		json_buf.WriteString(row + ",")
 	}
+
+	strJson := json_buf.String()
 	strJson = strJson[0 : len(strJson)-1]
 	strJson += "]"
 

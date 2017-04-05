@@ -2,13 +2,12 @@
 package main
 
 import (
-	"bufio"
+	"bytes"
 	"comm"
 	"database/sql"
+	"encoding/json"
 	"flag"
-	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -16,78 +15,53 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var db_mysql *sql.DB
+var db *sql.DB
 var ds_sql map[string]string
 
 func iner_init(strconn string) {
 	var err error
-	db_mysql, err = sql.Open("mysql", strconn)
+	db, err = sql.Open("mysql", strconn)
 	if err != nil {
 		panic(err.Error())
 	}
 
 	ds_sql = make(map[string]string)
-	loadconfig()
+	update_config()
 
-	db_mysql.SetMaxOpenConns(200)
-	db_mysql.SetMaxIdleConns(100)
+	db.SetMaxOpenConns(200)
+	db.SetMaxIdleConns(100)
 
-	err = db_mysql.Ping()
+	err = db.Ping()
 	if err != nil {
 		panic(err.Error())
 	}
 }
 
 func timer1() {
-	timer1 := time.NewTicker(30 * time.Second)
+	timer1 := time.NewTicker(60 * time.Second)
 	for {
 		select {
 		case <-timer1.C:
-			loadconfig()
-		}
-	}
-}
-
-func loadconfig() {
-	f, err := os.Open("config.txt")
-	if err != nil {
-		return
-	}
-	defer f.Close()
-
-	buf := bufio.NewReader(f)
-	for {
-		line, err := buf.ReadString('\n')
-		line = strings.TrimSpace(line)
-		kv := strings.Split(line, "^")
-		if _, ok := ds_sql[kv[0]]; len(kv) == 2 && false == ok {
-			ds_sql[kv[0]] = kv[1]
-			fmt.Println("load cmd:", kv[0], "exec_sql:", kv[1])
-		}
-
-		if err != nil {
-			break
+			update_config()
 		}
 	}
 }
 
 func main() {
-	tls := flag.Int("tls", 0, "0 disable tls 1 enable tls")
-	port := flag.Int("port", 80, "default port http:80 https:443")
-
-	str_DBHost := flag.String("dbhost", "130.1.10.230", "default host 127.0.0.1")
-	str_DBPort := flag.String("dbport", "3306", "default port 3306")
-	str_DBUser := flag.String("dbuser", "root", "default user root")
-	str_DBPass := flag.String("dbpass", "root", "default pass root")
-	str_DBName := flag.String("dbname", "mysql", "default dbname mysql")
-	str_DBCharset := flag.String("dbcharset", "utf8", "default charset utf8")
+	tls := flag.Int("tls", 0, "0:disable 1:enable")
+	port := flag.Int("port", 80, "http:80 https:443")
+	str_DBHost := flag.String("dbhost", "127.0.0.1", "")
+	str_DBPort := flag.String("dbport", "3306", "")
+	str_DBUser := flag.String("dbuser", "root", "")
+	str_DBPass := flag.String("dbpass", "root", "")
+	str_DBName := flag.String("dbname", "mysql", "")
+	str_DBCharset := flag.String("dbcharset", "utf8", "")
 	flag.Parse()
 
 	str_conn := *str_DBUser + ":" + *str_DBPass
 	str_conn += "@tcp(" + *str_DBHost + ":" + *str_DBPort + ")/"
 	str_conn += *str_DBName + "?charset=" + *str_DBCharset
 
-	fmt.Println(str_conn)
 	iner_init(str_conn)
 
 	listen_addr := ":"
@@ -97,7 +71,7 @@ func main() {
 		listen_addr += strconv.Itoa(*port)
 	}
 
-	defer db_mysql.Close()
+	defer db.Close()
 	go timer1()
 
 	http.Handle("/", http.FileServer(http.Dir("./html/")))
@@ -115,30 +89,44 @@ func main() {
 	}
 }
 
-//url http://127.0.0.1/do?cmd=getdb1&param="a":"3","b":"4"
+//http://127.0.0.1/do?cmd=method&param={%22sid%22:%221%22,%22eid%22:%223%22}
 func ds(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
+	strCmd := r.Form.Get("cmd")
+	strParam := r.Form.Get("param")
 
 	strRst := ""
 	strMsg := ""
-
-	strCmd := r.Form.Get("cmd")
-	strPar := r.Form.Get("param")
-
+	strVal := ""
+	var err error
+	var json_buf bytes.Buffer
 	strSql := ds_sql[strCmd]
-	strVal, err := comm.Sql2Json(db_mysql, strSql)
-	if nil != err {
-		strRst = "-1"
-		strMsg = err.Error()
-		strVal = "null"
-	} else {
-		strRst = "0"
-		strMsg = "ok"
-	}
-	strJson := `{"result":` + strRst + ","
-	strJson += `"msg":"` + strMsg + `",`
-	strJson += `"data":` + strVal + "}"
-	w.Write([]byte(strPar))
-	w.Write([]byte(strJson))
 
+	var m_param map[string]string
+	if err = json.Unmarshal([]byte(strParam), &m_param); err == nil {
+		for k, v := range m_param {
+			strSql = strings.Replace(strSql, "#"+k+"#", v, -1)
+		}
+
+		strVal, err = comm.Sql2Json(db, strSql)
+		if nil != err {
+			strRst = "-1"
+			strMsg = err.Error()
+			strVal = "null"
+		} else {
+			strRst = "0"
+			strMsg = "ok"
+		}
+	} else {
+		strRst = "-1"
+		strMsg = "param error"
+	}
+
+	json_buf.WriteString(`{"result":` + strRst + ",")
+	json_buf.WriteString(`"msg":"` + strMsg + `",`)
+	json_buf.WriteString(`"data":` + strVal + "}")
+
+	json_buf.Reset()
+
+	w.Write(json_buf.Bytes())
 }
