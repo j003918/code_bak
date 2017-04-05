@@ -1,27 +1,18 @@
-#fee^select name,id from oa0618.reimbursement_fee_type where id >= #sid# and id <= #eid#
-
-fee{select name,id from oa0618.reimbursement_fee_type where 1=1	and id >= #sid#	and id <= #eid#}
-
-fee2{
-	select name,id from oa0618.reimbursement_fee_type 
+fee{
+	select name,id 
+	from reimbursement_fee_type 
 	where 1=1
-	and id >= #sid# 
-	and id <= #eid#
+	and id >=#sid#
+	and id <=#eid#
 }
 
-fee3{
-	select name,id from oa0618.reimbursement_fee_type 
-	where 1=1
-	and id >= #sid# 
-	and id <= #eid#
-}
-
-fee4{
-	select name,id from oa0618.reimbursement_fee_type 
-	where 1=1
-	and id >= #sid# 
-	and id <= #eid#
-}
 dept{
 	select * from v_jhf_dept
 }
+
+user{
+	select a.username,a.userid,a.fullname,a.depid,b.depname 
+	from app_user a 
+	left join department b on a.depid=b.depid
+}
+

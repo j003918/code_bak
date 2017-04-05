@@ -4,13 +4,14 @@ package main
 import (
 	"bytes"
 	"comm"
+	"compress/gzip"
 	"database/sql"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -37,24 +38,14 @@ func iner_init(strconn string) {
 	}
 }
 
-func timer1() {
-	timer1 := time.NewTicker(60 * time.Second)
-	for {
-		select {
-		case <-timer1.C:
-			update_config()
-		}
-	}
-}
-
 func main() {
 	tls := flag.Int("tls", 0, "0:disable 1:enable")
 	port := flag.Int("port", 80, "http:80 https:443")
-	str_DBHost := flag.String("dbhost", "127.0.0.1", "")
+	str_DBHost := flag.String("dbhost", "172.25.125.101", "")
 	str_DBPort := flag.String("dbport", "3306", "")
 	str_DBUser := flag.String("dbuser", "root", "")
 	str_DBPass := flag.String("dbpass", "root", "")
-	str_DBName := flag.String("dbname", "mysql", "")
+	str_DBName := flag.String("dbname", "oa0618", "")
 	str_DBCharset := flag.String("dbcharset", "utf8", "")
 	flag.Parse()
 
@@ -91,42 +82,78 @@ func main() {
 
 //http://127.0.0.1/do?cmd=method&param={%22sid%22:%221%22,%22eid%22:%223%22}
 func ds(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	strCmd := r.Form.Get("cmd")
-	strParam := r.Form.Get("param")
-
+	var err error
+	var json_buf bytes.Buffer
+	var m_param map[string]string
 	strRst := ""
 	strMsg := ""
 	strVal := ""
-	var err error
-	var json_buf bytes.Buffer
+
+	r.ParseForm()
+	strCmd := r.Form.Get("cmd")
+	strParam := r.Form.Get("param")
 	strSql := ds_sql[strCmd]
 
-	var m_param map[string]string
-	if err = json.Unmarshal([]byte(strParam), &m_param); err == nil {
-		for k, v := range m_param {
-			strSql = strings.Replace(strSql, "#"+k+"#", v, -1)
-		}
-
-		strVal, err = comm.Sql2Json(db, strSql)
-		if nil != err {
-			strRst = "-1"
-			strMsg = err.Error()
-			strVal = "null"
-		} else {
-			strRst = "0"
-			strMsg = "ok"
-		}
-	} else {
+	if strCmd == "" || strSql == "" {
 		strRst = "-1"
-		strMsg = "param error"
+		strMsg = "cmd error"
+		strVal = "null"
+		goto WRITE_JSON
 	}
 
+	err = json.Unmarshal([]byte(strParam), &m_param)
+	if strParam != "" {
+		err = json.Unmarshal([]byte(strParam), &m_param)
+		if nil != err {
+			strRst = "-1"
+			strMsg = "param error"
+			strVal = "null"
+			goto WRITE_JSON
+		} else {
+			for k, v := range m_param {
+				strSql = strings.Replace(strSql, "#"+k+"#", v, -1)
+			}
+		}
+	}
+
+	strVal, err = comm.Sql2Json(db, strSql)
+	if nil != err {
+		strRst = "-1"
+		strMsg = err.Error()
+		strVal = "null"
+	} else {
+		strRst = "0"
+		strMsg = "ok"
+	}
+
+WRITE_JSON:
 	json_buf.WriteString(`{"result":` + strRst + ",")
 	json_buf.WriteString(`"msg":"` + strMsg + `",`)
-	json_buf.WriteString(`"data":` + strVal + "}")
+	json_buf.WriteString(`"data":`)
+	json_buf.WriteString(strVal)
+	json_buf.WriteString("}")
 
-	json_buf.Reset()
+	w.Header().Set("Connection", "close")
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Pragma", "no")
 
-	w.Write(json_buf.Bytes())
+	if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") && json_buf.Len() >= 1024 {
+		var gzbuf bytes.Buffer
+		gz := gzip.NewWriter(&gzbuf)
+		defer gz.Close()
+		_, err = gz.Write(json_buf.Bytes())
+		gz.Flush()
+		if err == nil {
+			w.Header().Set("Content-Encoding", "gzip")
+			w.Header().Set("Content-Length", strconv.Itoa(gzbuf.Len()))
+			w.Write(gzbuf.Bytes())
+		} else {
+			fmt.Println(err.Error())
+			w.Write(json_buf.Bytes())
+			return
+		}
+	} else {
+		w.Write(json_buf.Bytes())
+	}
 }

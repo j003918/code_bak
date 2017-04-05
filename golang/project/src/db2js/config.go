@@ -7,10 +7,25 @@ import (
 	"io"
 	"os"
 	"strings"
+	"time"
 )
 
+const CFG_FILE_REFRESH = 30
+
+var CFG_FILE_NAME string = "config.txt"
+
+func timer1() {
+	timer1 := time.NewTicker(CFG_FILE_REFRESH * time.Second)
+	for {
+		select {
+		case <-timer1.C:
+			update_config()
+		}
+	}
+}
+
 func update_config() {
-	f, err := os.Open("config.txt")
+	f, err := os.Open(CFG_FILE_NAME)
 	if err != nil {
 		return
 	}
@@ -18,7 +33,6 @@ func update_config() {
 
 	strTmp := ""
 	strCmd := ""
-
 	buf := bufio.NewReader(f)
 	for {
 		line, err := buf.ReadString('\n')
@@ -34,7 +48,6 @@ func update_config() {
 			case rune('}'):
 				if _, ok := ds_sql[strCmd]; false == ok {
 					ds_sql[strCmd] = strings.TrimSpace(strTmp)
-					//fmt.Println("load cmd:", strCmd, "exec_sql:", strings.TrimSpace(strTmp))
 					fmt.Println("load method:", strCmd)
 				}
 				ds_sql[strCmd] = strTmp
