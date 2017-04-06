@@ -3,7 +3,6 @@ package main
 
 import (
 	"bytes"
-	"comm"
 	"compress/gzip"
 	"database/sql"
 	"encoding/json"
@@ -14,6 +13,7 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/j003918/sql2json"
 )
 
 var db *sql.DB
@@ -116,7 +116,7 @@ func ds(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	strVal, err = comm.Sql2Json(db, strSql)
+	strVal, err = sql2json.GetJson(db, strSql)
 	if nil != err {
 		strRst = "-1"
 		strMsg = err.Error()
