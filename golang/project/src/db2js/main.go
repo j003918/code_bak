@@ -80,7 +80,7 @@ func main() {
 	}
 }
 
-//http://127.0.0.1/do?cmd=method&param={%22sid%22:%221%22,%22eid%22:%223%22}
+//http://127.0.0.1/do?cmd=fee&param={"sid":"1","eid":"3"}
 func ds(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var json_buf bytes.Buffer
