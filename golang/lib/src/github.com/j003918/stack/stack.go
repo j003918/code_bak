@@ -3,15 +3,24 @@ package stack
 
 import (
 	"container/list"
+	"sync"
 )
 
 type Stack struct {
-	l *list.List
+	l   *list.List
+	mux *sync.Mutex
 }
 
 func NewStack() *Stack {
-	l := list.New()
-	return &Stack{l}
+	return &Stack{list.New(), new(sync.Mutex)}
+}
+
+func (s *Stack) Lock() {
+	s.mux.Lock()
+}
+
+func (s *Stack) Unlock() {
+	s.mux.Unlock()
 }
 
 func (s *Stack) List() *list.List {

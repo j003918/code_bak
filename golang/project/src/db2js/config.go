@@ -3,15 +3,15 @@ package main
 
 import (
 	"bufio"
-	"database/sql"
+	//	"database/sql"
 	"fmt"
 	"io"
-	"log"
+	//	"log"
 	"os"
 	"strings"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
+	//	_ "github.com/mattn/go-sqlite3"
 )
 
 const CFG_FILE_REFRESH = 30
@@ -61,6 +61,7 @@ func timer1() {
 	}
 }
 
+/*
 func test_sqlite() {
 	//os.Remove(CFG_DB)
 
@@ -95,8 +96,8 @@ func test_sqlite() {
 				fmt.Println("insert id : ", id)
 			}
 		}
-	*/
-
+*/
+/*
 	rows, err := db.Query("select type_id, type_name,drive_name,status,create_time from syscfg_db_type")
 	if err != nil {
 		log.Fatal(err)
@@ -112,7 +113,7 @@ func test_sqlite() {
 		fmt.Println(type_id, type_name, drive_name, status, create_time)
 	}
 }
-
+*/
 func update_config() {
 	f, err := os.Open(CFG_FILE_NAME)
 	if err != nil {

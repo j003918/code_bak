@@ -9,6 +9,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	//	_ "net/http/pprof"
 	"strconv"
 	"strings"
 
@@ -29,8 +30,8 @@ func iner_init(strconn string) {
 	ds_sql = make(map[string]string)
 	update_config()
 
-	db.SetMaxOpenConns(200)
-	db.SetMaxIdleConns(100)
+	db.SetMaxOpenConns(100)
+	db.SetMaxIdleConns(50)
 
 	err = db.Ping()
 	if err != nil {
@@ -41,11 +42,11 @@ func iner_init(strconn string) {
 func main() {
 	tls := flag.Int("tls", 0, "0:disable 1:enable")
 	port := flag.Int("port", 80, "http:80 https:443")
-	str_DBHost := flag.String("dbhost", "172.25.125.101", "")
+	str_DBHost := flag.String("dbhost", "127.0.0.1", "")
 	str_DBPort := flag.String("dbport", "3306", "")
 	str_DBUser := flag.String("dbuser", "root", "")
 	str_DBPass := flag.String("dbpass", "root", "")
-	str_DBName := flag.String("dbname", "oa0618", "")
+	str_DBName := flag.String("dbname", "mysql", "")
 	str_DBCharset := flag.String("dbcharset", "utf8", "")
 	flag.Parse()
 
@@ -78,6 +79,8 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+
+	db.Close()
 }
 
 //http://127.0.0.1/do?cmd=fee&param={"sid":"1","eid":"3"}
@@ -85,6 +88,7 @@ func ds(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var json_buf bytes.Buffer
 	var m_param map[string]string
+
 	strRst := ""
 	strMsg := ""
 	strVal := ""
