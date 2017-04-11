@@ -3,14 +3,12 @@ package main
 
 import (
 	"bufio"
-	//	"database/sql"
 	"fmt"
 	"io"
 	//	"log"
 	"os"
 	"strings"
 	"time"
-
 	//	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -136,11 +134,11 @@ func update_config() {
 				strCmd = strings.TrimSpace(strTmp)
 				strTmp = ""
 			case rune('}'):
-				if _, ok := ds_sql[strCmd]; false == ok {
+				if _, ok := ds_sql[strCmd]; !ok {
 					ds_sql[strCmd] = strings.TrimSpace(strTmp)
 					fmt.Println("load method:", strCmd)
 				}
-				ds_sql[strCmd] = strTmp
+				//ds_sql[strCmd] = strTmp
 				strTmp = ""
 			default:
 				strTmp += string(v)
@@ -148,10 +146,10 @@ func update_config() {
 		}
 
 		if err != nil {
-			break
 			if err != io.EOF {
 				fmt.Println(err.Error())
 			}
+			break
 		}
 	}
 }
