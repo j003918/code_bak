@@ -2,7 +2,7 @@
 package rpn
 
 import (
-	"github.com/j003918/stack"
+	"github.com/j003918/liststack"
 )
 
 func opr_level(opr string) int {
@@ -22,8 +22,8 @@ func Get_RPN(expression string, split string) string {
 	str_rpn := ""
 	str_tmp := ""
 	ch := ""
-	rpn := stack.NewStack()
-	opr := stack.NewStack()
+	rpn := liststack.New()
+	opr := liststack.New()
 
 	for _, v := range expression {
 		ch = string(v)
@@ -77,7 +77,7 @@ func Get_RPN(expression string, split string) string {
 		rpn.Push(opr.Pop())
 	}
 
-	for e := rpn.List().Front(); e != nil; e = e.Next() {
+	for e := rpn.Front(); e != nil; e = e.Next() {
 		str_rpn += e.Value.(string) + split
 	}
 

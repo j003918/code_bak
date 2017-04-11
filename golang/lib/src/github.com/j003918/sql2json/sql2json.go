@@ -20,9 +20,10 @@ func GetJson(db *sql.DB, strSql string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer rows.Close()
+	rows.Close()
 
 	columns, err := rows.Columns()
+
 	if err != nil {
 		return "", err
 	}
@@ -62,6 +63,8 @@ func GetJson(db *sql.DB, strSql string) (string, error) {
 		//strJson = strJson + row + ","
 		json_buf.WriteString(row + ",")
 	}
+
+	rows.Close()
 
 	strJson := json_buf.String()
 	strJson = strJson[0 : len(strJson)-1]
