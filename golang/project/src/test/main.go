@@ -4,9 +4,12 @@ package main
 import (
 	"container/list"
 	"fmt"
+	"time"
 	//	"fmt"
 	"sync"
 	//"runtime"
+	//	"github.com/robfig/cron"
+	"github.com/j003918/liststack"
 )
 
 //var ch  = make(chan,int)
@@ -82,18 +85,52 @@ func foo(s *Stack1, ch chan int, i int) {
 	ch <- i
 }
 
+func foo1() {
+	fmt.Println(time.Now())
+}
+
+type sstack struct {
+	list.List
+}
+
+func ss_new() *sstack {
+	return new(sstack)
+}
+
+func (s *sstack) Top() interface{} {
+	return s.Front().Value
+}
+
+func (s *sstack) Pop() interface{} {
+
+	e := s.Back()
+	s.Remove(e)
+	return e.Value
+}
+
+func (s *sstack) Push(v interface{}) {
+
+	s.PushBack(v)
+}
+
 func main() {
-	ch := make(chan int)
-	ss := NewStack()
-	//runtime.GOMAXPROCS(2)
-	//fmt.Println(runtime.NumCPU())
-	go foo(ss, ch, 1)
-	go foo(ss, ch, 2)
-	go foo(ss, ch, 3)
-	go foo(ss, ch, 4)
-	<-ch
-	<-ch
-	<-ch
-	<-ch
-	fmt.Println(ss.Len())
+
+	ss := liststack.New()
+
+	ss.Lock()
+	ss.Push(1)
+	ss.Unlock()
+	ss.Push(2)
+	ss.Push(3)
+	ss.Push("a")
+	ss.Push("b")
+	ss.Push("c")
+
+	fmt.Println(ss.Pop())
+	fmt.Println(ss.Pop())
+	fmt.Println(ss.Pop())
+	fmt.Println(ss.Pop())
+	fmt.Println(ss.Pop())
+	fmt.Println(ss.Pop())
+
 }

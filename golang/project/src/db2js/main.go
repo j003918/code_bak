@@ -5,11 +5,9 @@ import (
 	"bytes"
 	"compress/gzip"
 	"database/sql"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"net/http"
-	//	_ "net/http/pprof"
 	"strconv"
 	"strings"
 
@@ -64,7 +62,7 @@ func main() {
 	}
 
 	defer db.Close()
-	go timer1()
+	go ReloadConfig(30)
 
 	http.Handle("/", http.FileServer(http.Dir("./html/")))
 	http.HandleFunc("/do", ds)
@@ -79,58 +77,39 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-
-	db.Close()
 }
 
-//http://127.0.0.1/do?cmd=fee&param={"sid":"1","eid":"3"}
+//http://127.0.0.1/do?cmd=fee&param=w
 func ds(w http.ResponseWriter, r *http.Request) {
-	var err error
-	var json_buf bytes.Buffer
-	var m_param map[string]string
-
-	strRst := ""
-	strMsg := ""
-	strVal := ""
-
 	r.ParseForm()
 	strCmd := r.Form.Get("cmd")
-	strParam := r.Form.Get("param")
 	strSql := ds_sql[strCmd]
-
-	if strCmd == "" || strSql == "" {
-		strRst = "-1"
-		strMsg = "cmd error"
-		strVal = "null"
-		goto WRITE_JSON
+	for k, _ := range r.Form {
+		strSql = strings.Replace(strSql, "#"+k+"#", r.Form.Get(k), -1)
 	}
 
-	err = json.Unmarshal([]byte(strParam), &m_param)
-	if strParam != "" {
-		err = json.Unmarshal([]byte(strParam), &m_param)
+	strRst := "-1"
+	strMsg := "error"
+	strVal := "null"
+	var err error
+
+	if strCmd == "" || strSql == "" || strings.ContainsAny(strSql, "#") {
+		strRst = "-1"
+		strMsg = "cmd or param error"
+		strVal = "null"
+	} else {
+		strVal, err = sql2json.GetJson(db, strSql)
 		if nil != err {
 			strRst = "-1"
-			strMsg = "param error"
+			strMsg = err.Error()
 			strVal = "null"
-			goto WRITE_JSON
 		} else {
-			for k, v := range m_param {
-				strSql = strings.Replace(strSql, "#"+k+"#", v, -1)
-			}
+			strRst = "0"
+			strMsg = "ok"
 		}
 	}
 
-	strVal, err = sql2json.GetJson(db, strSql)
-	if nil != err {
-		strRst = "-1"
-		strMsg = err.Error()
-		strVal = "null"
-	} else {
-		strRst = "0"
-		strMsg = "ok"
-	}
-
-WRITE_JSON:
+	var json_buf bytes.Buffer
 	json_buf.WriteString(`{"result":` + strRst + ",")
 	json_buf.WriteString(`"msg":"` + strMsg + `",`)
 	json_buf.WriteString(`"data":`)

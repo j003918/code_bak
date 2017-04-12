@@ -49,8 +49,8 @@ var (
 		);`
 )
 
-func timer1() {
-	timer1 := time.NewTicker(CFG_FILE_REFRESH * time.Second)
+func ReloadConfig(sec time.Duration) {
+	timer1 := time.NewTicker(sec * time.Second)
 	for {
 		select {
 		case <-timer1.C:
