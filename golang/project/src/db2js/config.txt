@@ -1,5 +1,5 @@
 mysql_user{
-	select * from user where USER="#n#"
+	select * from user where USER="#user#"
 }
 
 oci8_dept{

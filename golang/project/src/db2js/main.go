@@ -7,7 +7,6 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
-	//	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -49,15 +48,17 @@ func init() {
 	cmdArgs["dbcharset"] = *str_DBCharset
 
 	update_config()
+
+	initDB()
 }
 
 /* liteide *.env add param support oci8
-MINGW64=D:\mingw-w64\mingw64
-instantclient=D:\instantclient_12_2
+MINGW64=D:\mingw-w64\mingw64\
+instantclient=D:\instantclient_12_2\
 #PKG_CONFIG_PATH include pkg-config.exe oci8.pc
-PKG_CONFIG_PATH=%instantclient%\pkg-config
-TNS_ADMIN=D:\instantclient_12_2\network\admin
-PATH=%PATH%;%MINGW64%\bin;%GOROOT%\bin;%instantclient%;%PKG_CONFIG_PATH%
+PKG_CONFIG_PATH=%instantclient%\pkg-config\
+TNS_ADMIN=%instantclient%\network\admin\
+PATH=%PATH%;%MINGW64%\bin;%GOROOT%\bin;%instantclient%;%instantclient%\pkg-config
 */
 func initDB() {
 	var err error
@@ -88,8 +89,6 @@ func initDB() {
 }
 
 func main() {
-	initDB()
-
 	listen_addr := ":"
 	if "80" == cmdArgs["port"] && "1" == cmdArgs["tls"] {
 		listen_addr += "443"
