@@ -134,8 +134,8 @@ func update_config() {
 				strCmd = strings.TrimSpace(strTmp)
 				strTmp = ""
 			case rune('}'):
-				if _, ok := ds_sql[strCmd]; !ok {
-					ds_sql[strCmd] = strings.TrimSpace(strTmp)
+				if _, ok := methodSql[strCmd]; !ok {
+					methodSql[strCmd] = strings.TrimSpace(strTmp)
 					fmt.Println("load method:", strCmd)
 				}
 				//ds_sql[strCmd] = strTmp

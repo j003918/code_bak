@@ -7,26 +7,68 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	//	"log"
 	"net/http"
 	"strconv"
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/j003918/sql2json"
+	_ "github.com/mattn/go-oci8"
 )
 
-var db *sql.DB
-var ds_sql map[string]string
+var (
+	db        *sql.DB
+	methodSql map[string]string
+	cmdArgs   map[string]string
+)
 
-func iner_init(strconn string) {
+func init() {
+	methodSql = make(map[string]string)
+	cmdArgs = make(map[string]string)
+
+	tls := flag.Int("tls", 0, "0:disable 1:enable")
+	port := flag.Int("port", 80, "http:80 https:443")
+	str_DBDriver := flag.String("dbdriver", "mysql", "mysql:oci8")
+	str_DBHost := flag.String("dbhost", "127.0.0.1", "")
+	str_DBPort := flag.String("dbport", "3306", "")
+	str_DBUser := flag.String("dbuser", "root", "")
+	str_DBPass := flag.String("dbpass", "root", "")
+	str_DBName := flag.String("dbname", "mysql", "")
+	str_DBCharset := flag.String("dbcharset", "utf8", "")
+	flag.Parse()
+
+	cmdArgs["tls"] = strconv.Itoa(*tls)
+	cmdArgs["port"] = strconv.Itoa(*port)
+	cmdArgs["dbdriver"] = *str_DBDriver
+	cmdArgs["dbhost"] = *str_DBHost
+	cmdArgs["dbport"] = *str_DBPort
+	cmdArgs["dbuser"] = *str_DBUser
+	cmdArgs["dbpass"] = *str_DBPass
+	cmdArgs["dbname"] = *str_DBName
+	cmdArgs["dbcharset"] = *str_DBCharset
+
+	update_config()
+}
+
+func initDB() {
 	var err error
-	db, err = sql.Open("mysql", strconn)
+
+	strDSN := ""
+	switch cmdArgs["dbdriver"] {
+	case "mysql":
+		strDSN += cmdArgs["dbuser"] + ":" + cmdArgs["dbpass"] //*str_DBPass
+		strDSN += "@tcp(" + cmdArgs["dbhost"] + ":" + cmdArgs["dbport"] + ")/"
+		strDSN += cmdArgs["dbname"] + "?charset=" + cmdArgs["dbcharset"]
+	case "oci8":
+		strDSN += cmdArgs["dbuser"] + "/" + cmdArgs["dbpass"] + "@" + cmdArgs["dbname"]
+	default:
+	}
+
+	db, err = sql.Open(cmdArgs["dbdriver"], strDSN)
 	if err != nil {
 		panic(err.Error())
 	}
-
-	ds_sql = make(map[string]string)
-	update_config()
 
 	db.SetMaxOpenConns(100)
 	db.SetMaxIdleConns(50)
@@ -38,27 +80,13 @@ func iner_init(strconn string) {
 }
 
 func main() {
-	tls := flag.Int("tls", 0, "0:disable 1:enable")
-	port := flag.Int("port", 80, "http:80 https:443")
-	str_DBHost := flag.String("dbhost", "127.0.0.1", "")
-	str_DBPort := flag.String("dbport", "3306", "")
-	str_DBUser := flag.String("dbuser", "root", "")
-	str_DBPass := flag.String("dbpass", "root", "")
-	str_DBName := flag.String("dbname", "mysql", "")
-	str_DBCharset := flag.String("dbcharset", "utf8", "")
-	flag.Parse()
-
-	str_conn := *str_DBUser + ":" + *str_DBPass
-	str_conn += "@tcp(" + *str_DBHost + ":" + *str_DBPort + ")/"
-	str_conn += *str_DBName + "?charset=" + *str_DBCharset
-
-	iner_init(str_conn)
+	initDB()
 
 	listen_addr := ":"
-	if 80 == *port && 1 == *tls {
+	if "80" == cmdArgs["port"] && "1" == cmdArgs["tls"] {
 		listen_addr += "443"
 	} else {
-		listen_addr += strconv.Itoa(*port)
+		listen_addr += cmdArgs["port"]
 	}
 
 	defer db.Close()
@@ -67,15 +95,10 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir("./html/")))
 	http.HandleFunc("/do", ds)
 
-	var err error
-	if *tls == 1 {
-		err = http.ListenAndServeTLS(listen_addr, "./ca/ca.crt", "./ca/ca.key", nil)
+	if "1" == cmdArgs["tls"] {
+		panic(http.ListenAndServeTLS(listen_addr, "./ca/ca.crt", "./ca/ca.key", nil))
 	} else {
-		err = http.ListenAndServe(listen_addr, nil)
-	}
-
-	if err != nil {
-		panic(err.Error())
+		panic(http.ListenAndServe(listen_addr, nil))
 	}
 }
 
@@ -83,7 +106,7 @@ func main() {
 func ds(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	strCmd := r.Form.Get("cmd")
-	strSql := ds_sql[strCmd]
+	strSql := methodSql[strCmd]
 	for k, _ := range r.Form {
 		strSql = strings.Replace(strSql, "#"+k+"#", r.Form.Get(k), -1)
 	}

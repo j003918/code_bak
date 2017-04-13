@@ -1,3 +1,11 @@
-user4{
+mysql_user{
 	select * from user where USER="#n#"
+}
+
+oci8_dept{
+select 
+DEPT_CODE ,
+NAME ,
+USER_NAME
+from COMM.STAFF_DICT
 }
