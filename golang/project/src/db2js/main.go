@@ -51,6 +51,14 @@ func init() {
 	update_config()
 }
 
+/* liteide *.env add param support oci8
+MINGW64=D:\mingw-w64\mingw64
+instantclient=D:\instantclient_12_2
+#PKG_CONFIG_PATH include pkg-config.exe oci8.pc
+PKG_CONFIG_PATH=%instantclient%\pkg-config
+TNS_ADMIN=D:\instantclient_12_2\network\admin
+PATH=%PATH%;%MINGW64%\bin;%GOROOT%\bin;%instantclient%;%PKG_CONFIG_PATH%
+*/
 func initDB() {
 	var err error
 

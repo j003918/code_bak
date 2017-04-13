@@ -3,4 +3,4 @@
 /*
 liststack document
 */
-package liststack
+package stack

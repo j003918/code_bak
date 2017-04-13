@@ -1,26 +1,26 @@
 // list_stack project liststack.go
-package liststack
+package stack
 
 import (
 	"container/list"
 	"sync"
 )
 
-type ListStack struct {
+type Stack struct {
 	list.List
 	sync.Mutex
 }
 
-func New() *ListStack {
-	return new(ListStack)
+func New() *Stack {
+	return new(Stack)
 
 }
 
-func (s *ListStack) Empty() bool {
+func (s *Stack) Empty() bool {
 	return s.Len() == 0
 }
 
-func (s *ListStack) Top() interface{} {
+func (s *Stack) Top() interface{} {
 	e := s.Back()
 	if e != nil {
 		return e.Value
@@ -28,7 +28,7 @@ func (s *ListStack) Top() interface{} {
 	return nil
 }
 
-func (s *ListStack) Pop() interface{} {
+func (s *Stack) Pop() interface{} {
 	e := s.Back()
 	if e != nil {
 		s.Remove(e)
@@ -37,11 +37,11 @@ func (s *ListStack) Pop() interface{} {
 	return nil
 }
 
-func (s *ListStack) Push(v interface{}) {
+func (s *Stack) Push(v interface{}) {
 	s.PushBack(v)
 }
 
-func (s *ListStack) Clean() {
+func (s *Stack) Clean() {
 	//add "n" for modify list.remove bug??
 	var n *list.Element
 	for e := s.Front(); e != nil; e = n {

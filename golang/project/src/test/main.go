@@ -2,34 +2,26 @@
 package main
 
 import (
-	"database/sql"
-	"log"
+	"fmt"
 
-	_ "github.com/mattn/go-oci8"
+	"github.com/j003918/hashset"
 )
 
-func test_oci() {
-
-	db1, err := sql.Open("oci8", "system/manager@HIS")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db1.Close()
-
-	rows, err := db1.Query(`select ITEM_NAME from COMM.PRICE_LIST where ITEM_CODE = '30130002050'`)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for rows.Next() {
-		var name string
-		rows.Scan(&name)
-		log.Printf("Name = %s, len=%d", name, len(name))
-	}
-	rows.Close()
-}
-
 func main() {
-	test_oci()
+	//hashset.
+	aa := hashset.New()
+
+	aa.Set(1)
+	aa.Set("2")
+
+	if aa.Contains(1) {
+		fmt.Println("1 ok")
+	}
+
+	aa.Del(1)
+
+	if !aa.Contains(1) {
+		fmt.Println("1 err")
+	}
 
 }

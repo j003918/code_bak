@@ -2,7 +2,7 @@
 package rpn
 
 import (
-	"github.com/j003918/liststack"
+	"github.com/j003918/datastruct/stack"
 )
 
 func opr_level(opr string) int {
@@ -22,8 +22,8 @@ func Get_RPN(expression string, split string) string {
 	str_rpn := ""
 	str_tmp := ""
 	ch := ""
-	rpn := liststack.New()
-	opr := liststack.New()
+	rpn := stack.New()
+	opr := stack.New()
 
 	for _, v := range expression {
 		ch = string(v)
