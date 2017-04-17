@@ -164,9 +164,11 @@ func ds(w http.ResponseWriter, r *http.Request) {
 	json_buf.WriteString("}")
 
 	w.Header().Set("Connection", "close")
-	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
-	w.Header().Set("Cache-Control", "no-cache")
-	w.Header().Set("Pragma", "no")
+	w.Header().Set("CharacterEncoding", "utf-8")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Pragma", "no-cache")
+	w.Header().Set("Cache-Control", "no-cache, no-store, max-age=0")
+	w.Header().Set("Expires", "1L")
 
 	if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") && json_buf.Len() >= 1024 {
 		var gzbuf bytes.Buffer

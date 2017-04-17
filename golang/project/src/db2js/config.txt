@@ -10,8 +10,16 @@ USER_NAME
 from COMM.STAFF_DICT
 }
 
-dept2{
+hisuser{
 select 
-user_name,name
+user_name,name,
+CREATE_DATE
+from COMM.STAFF_DICT
+order by CREATE_DATE
+}
+
+job{
+select 
+status
 from COMM.STAFF_DICT
 }

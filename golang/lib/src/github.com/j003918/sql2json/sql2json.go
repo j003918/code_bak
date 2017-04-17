@@ -28,16 +28,20 @@ func GetJson(db *sql.DB, strSql string) (string, error) {
 		return "", err
 	}
 
-	colVals := make([]sql.RawBytes, len(columns))
-	colKeys := make([]interface{}, len(colVals))
+	/*
+		colVals := make([]sql.RawBytes, len(columns))
+		colKeys := make([]interface{}, len(colVals))
+	*/
+	values := make([]sql.RawBytes, len(columns))
+	scans := make([]interface{}, len(columns))
 
-	for i := range colVals {
-		colKeys[i] = &colVals[i]
+	for i := range values {
+		scans[i] = &values[i]
 	}
 
 	json_buf.WriteString("[")
 	for rows.Next() {
-		err = rows.Scan(colKeys...)
+		err = rows.Scan(scans...)
 		if err != nil {
 			//fmt.Println("log:", err)
 			panic(err.Error())
@@ -45,7 +49,7 @@ func GetJson(db *sql.DB, strSql string) (string, error) {
 
 		row := "{"
 		var strVal string
-		for i, col := range colVals {
+		for i, col := range values {
 			if col == nil {
 				strVal = "null"
 			} else {
