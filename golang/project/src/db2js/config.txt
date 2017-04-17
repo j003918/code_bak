@@ -9,3 +9,9 @@ NAME ,
 USER_NAME
 from COMM.STAFF_DICT
 }
+
+dept2{
+select 
+user_name,name
+from COMM.STAFF_DICT
+}

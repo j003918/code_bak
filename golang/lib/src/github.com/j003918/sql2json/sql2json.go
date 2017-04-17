@@ -39,7 +39,7 @@ func GetJson(db *sql.DB, strSql string) (string, error) {
 	for rows.Next() {
 		err = rows.Scan(colKeys...)
 		if err != nil {
-			fmt.Println("log:", err)
+			//fmt.Println("log:", err)
 			panic(err.Error())
 		}
 

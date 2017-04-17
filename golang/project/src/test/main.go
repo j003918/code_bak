@@ -4,7 +4,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/j003918/hashset"
+	"github.com/j003918/datastruct/hashset"
 )
 
 func main() {

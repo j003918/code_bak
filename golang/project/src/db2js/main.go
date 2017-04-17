@@ -8,8 +8,11 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	//	"os"
+	//	"os/signal"
 	"strconv"
 	"strings"
+	//	"syscall"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/j003918/sql2json"
@@ -29,7 +32,7 @@ func init() {
 	tls := flag.Int("tls", 0, "0:disable 1:enable")
 	port := flag.Int("port", 80, "http:80 https:443")
 	str_DBDriver := flag.String("dbdriver", "mysql", "mysql:oci8")
-	str_DBHost := flag.String("dbhost", "127.0.0.1", "")
+	str_DBHost := flag.String("dbhost", "130.1.10.230", "")
 	str_DBPort := flag.String("dbport", "3306", "")
 	str_DBUser := flag.String("dbuser", "root", "")
 	str_DBPass := flag.String("dbpass", "root", "")
@@ -101,12 +104,26 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir("./html/")))
 	http.HandleFunc("/do", ds)
+	http.HandleFunc("/m/list", methodList)
+	http.HandleFunc("/m/del", methodDel)
 
 	if "1" == cmdArgs["tls"] {
 		panic(http.ListenAndServeTLS(listen_addr, "./ca/ca.crt", "./ca/ca.key", nil))
 	} else {
 		panic(http.ListenAndServe(listen_addr, nil))
 	}
+}
+
+func methodDel(w http.ResponseWriter, r *http.Request) {
+	delete(methodSql, r.Form.Get("m"))
+}
+
+func methodList(w http.ResponseWriter, r *http.Request) {
+	strTmp := ""
+	for k, v := range methodSql {
+		strTmp += k + "{" + string('\n') + v + string('\n') + "}" + strings.Repeat(string('\n'), 2)
+	}
+	w.Write([]byte(strTmp))
 }
 
 //http://127.0.0.1/do?cmd=fee&param=w
