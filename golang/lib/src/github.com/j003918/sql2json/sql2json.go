@@ -4,9 +4,11 @@ package sql2json
 import (
 	"bytes"
 	"database/sql"
+	//"database/sql/driver"
 	"errors"
 	"fmt"
 	"strings"
+	//"time"
 )
 
 func GetJson(db *sql.DB, strSql string) (string, error) {
@@ -28,11 +30,9 @@ func GetJson(db *sql.DB, strSql string) (string, error) {
 		return "", err
 	}
 
-	/*
-		colVals := make([]sql.RawBytes, len(columns))
-		colKeys := make([]interface{}, len(colVals))
-	*/
-	values := make([]sql.RawBytes, len(columns))
+	//fix bug time.Time nil
+	//values := make([]sql.RawBytes, len(columns))
+	values := make([]sql.NullString, len(columns))
 	scans := make([]interface{}, len(columns))
 
 	for i := range values {
@@ -43,17 +43,16 @@ func GetJson(db *sql.DB, strSql string) (string, error) {
 	for rows.Next() {
 		err = rows.Scan(scans...)
 		if err != nil {
-			//fmt.Println("log:", err)
 			panic(err.Error())
 		}
 
 		row := "{"
 		var strVal string
 		for i, col := range values {
-			if col == nil {
+			if !col.Valid {
 				strVal = "null"
 			} else {
-				strVal = string(col)
+				strVal = col.String
 			}
 
 			columName := strings.ToLower(columns[i])

@@ -9,11 +9,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	//	"os"
-	//	"os/signal"
 	"strconv"
 	"strings"
-	//	"syscall"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/j003918/sql2json"
@@ -29,7 +26,6 @@ var (
 func init() {
 	methodSql = make(map[string]string)
 	cmdArgs = make(map[string]string)
-	os.Setenv("NLS_LANG", "AMERICAN_AMERICA.AL32UTF8")
 
 	tls := flag.Int("tls", 0, "0:disable 1:enable")
 	port := flag.Int("port", 80, "http:80 https:443")
@@ -53,17 +49,15 @@ func init() {
 	cmdArgs["dbcharset"] = *str_DBCharset
 
 	update_config()
-
 	initDB()
 }
 
-/* liteide *.env add param support oci8
-MINGW64=D:\mingw-w64\mingw64\
-instantclient=D:\instantclient_12_2\
-#PKG_CONFIG_PATH include pkg-config.exe oci8.pc
-PKG_CONFIG_PATH=%instantclient%\pkg-config\
-TNS_ADMIN=%instantclient%\network\admin\
-PATH=%PATH%;%MINGW64%\bin;%GOROOT%\bin;%instantclient%;%instantclient%\pkg-config
+/* liteide *.env add ENV support oci8
+MINGW64=D:/mingw-w64/mingw64
+instantclient=D:/instantclient_12_2
+PKG_CONFIG_PATH=%instantclient%/pkg-config
+TNS_ADMIN=%instantclient%/network/admin
+PATH=%PATH%;%MINGW64%/bin;%GOROOT%/bin;%instantclient%;%instantclient%/pkg-config
 */
 func initDB() {
 	var err error
@@ -75,6 +69,7 @@ func initDB() {
 		strDSN += "@tcp(" + cmdArgs["dbhost"] + ":" + cmdArgs["dbport"] + ")/"
 		strDSN += cmdArgs["dbname"] + "?charset=" + cmdArgs["dbcharset"]
 	case "oci8":
+		os.Setenv("NLS_LANG", "AMERICAN_AMERICA.AL32UTF8")
 		strDSN += cmdArgs["dbuser"] + "/" + cmdArgs["dbpass"] + "@" + cmdArgs["dbname"]
 	default:
 	}
@@ -175,9 +170,10 @@ func ds(w http.ResponseWriter, r *http.Request) {
 	if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") && json_buf.Len() >= 1024 {
 		var gzbuf bytes.Buffer
 		gz := gzip.NewWriter(&gzbuf)
-		defer gz.Close()
+		//defer gz.Close()
 		_, err = gz.Write(json_buf.Bytes())
-		gz.Flush()
+		gz.Close()
+		//gz.Flush()
 		if err == nil {
 			w.Header().Set("Content-Encoding", "gzip")
 			w.Header().Set("Content-Length", strconv.Itoa(gzbuf.Len()))
