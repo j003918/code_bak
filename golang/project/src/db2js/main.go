@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 	//	"os"
 	//	"os/signal"
 	"strconv"
@@ -28,6 +29,7 @@ var (
 func init() {
 	methodSql = make(map[string]string)
 	cmdArgs = make(map[string]string)
+	os.Setenv("NLS_LANG", "AMERICAN_AMERICA.AL32UTF8")
 
 	tls := flag.Int("tls", 0, "0:disable 1:enable")
 	port := flag.Int("port", 80, "http:80 https:443")
