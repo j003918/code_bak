@@ -12,8 +12,9 @@ import (
 	"strconv"
 	"strings"
 
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/j003918/sql2json"
+
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/mattn/go-oci8"
 )
 
@@ -112,6 +113,7 @@ func main() {
 }
 
 func methodDel(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
 	delete(methodSql, r.Form.Get("m"))
 }
 
@@ -170,10 +172,8 @@ func ds(w http.ResponseWriter, r *http.Request) {
 	if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") && json_buf.Len() >= 1024 {
 		var gzbuf bytes.Buffer
 		gz := gzip.NewWriter(&gzbuf)
-		//defer gz.Close()
 		_, err = gz.Write(json_buf.Bytes())
 		gz.Close()
-		//gz.Flush()
 		if err == nil {
 			w.Header().Set("Content-Encoding", "gzip")
 			w.Header().Set("Content-Length", strconv.Itoa(gzbuf.Len()))

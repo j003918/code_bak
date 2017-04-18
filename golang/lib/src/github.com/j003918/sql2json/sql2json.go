@@ -4,6 +4,7 @@ package sql2json
 import (
 	"bytes"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -37,6 +38,11 @@ func GetJson(db *sql.DB, strSql string) (string, error) {
 		scans[i] = &values[i]
 	}
 
+	type Jitem struct {
+		Item string `json:"e"`
+	}
+	var jitem Jitem
+
 	json_buf.WriteString("[")
 	for rows.Next() {
 		err = rows.Scan(scans...)
@@ -50,8 +56,13 @@ func GetJson(db *sql.DB, strSql string) (string, error) {
 			if !col.Valid {
 				strVal = "null"
 			} else {
-				strVal = col.String
+				jitem.Item = col.String //strings.Replace(col.String, string('\r'), " ", -1)
+				//strVal = strings.Replace(strVal, string('\n'), " ", -1)
+				bs, _ := json.Marshal(&jitem)
+				strVal = string(bs[6 : len(bs)-2])
 			}
+
+			//Jitem.Item = strVal
 
 			columName := strings.ToLower(columns[i])
 			cell := fmt.Sprintf(`"%v":"%v"`, columName, strVal)

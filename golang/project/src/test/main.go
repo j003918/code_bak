@@ -2,26 +2,33 @@
 package main
 
 import (
+	"encoding/json"
+	//"encoding/json"
 	"fmt"
 
-	"github.com/j003918/datastruct/hashset"
+	//"github.com/j003918/datastruct/hashset"
 )
 
 func main() {
-	//hashset.
-	aa := hashset.New()
+	aa := ``
 
-	aa.Set(1)
-	aa.Set("2")
+	//bb := "dddd"
 
-	if aa.Contains(1) {
-		fmt.Println("1 ok")
+	type Jitem struct {
+		Val string `json:"t"`
 	}
 
-	aa.Del(1)
-
-	if !aa.Contains(1) {
-		fmt.Println("1 err")
+	var p *Jitem = &Jitem{
+		Val: aa,
 	}
 
+	if bs, err := json.Marshal(&p); err != nil {
+		panic(err)
+	} else {
+		//result --> {"username":"brainwu","Age":21,"Gender":true,"Profile":"I am Wujunbin","Count":"0"}
+		fmt.Println(string(bs))
+		fmt.Println(string(bs[6 : len(bs)-2]))
+	}
+
+	//fmt.Println(aa)
 }

@@ -1,5 +1,5 @@
 mysql_user{
-	select * from user where USER="#user#"
+	select * from zyyoutdoor.t_ris_report where patient_id='#pid#'
 }
 
 oci8_dept{
@@ -12,10 +12,9 @@ from COMM.STAFF_DICT
 
 hisuser{
 select 
-user_name,name,
-CREATE_DATE
+*
 from COMM.STAFF_DICT
-order by CREATE_DATE
+--order by CREATE_DATE
 }
 
 job{
