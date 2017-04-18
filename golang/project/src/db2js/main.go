@@ -125,7 +125,6 @@ func methodList(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(strTmp))
 }
 
-/*
 //http://127.0.0.1/do?cmd=fee&param=w
 func ds(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
@@ -137,70 +136,7 @@ func ds(w http.ResponseWriter, r *http.Request) {
 
 	strRst := "-1"
 	strMsg := "error"
-	strVal := "null"
-	var err error
-
-	if strCmd == "" || strSql == "" || strings.ContainsAny(strSql, "#") {
-		strRst = "-1"
-		strMsg = "cmd or param error"
-		strVal = "null"
-	} else {
-		strVal, err = sql2json.GetJson(db, strSql)
-		if nil != err {
-			strRst = "-1"
-			strMsg = err.Error()
-			strVal = "null"
-		} else {
-			strRst = "0"
-			strMsg = "ok"
-		}
-	}
-
-	var json_buf bytes.Buffer
-	json_buf.WriteString(`{"result":` + strRst + ",")
-	json_buf.WriteString(`"msg":"` + strMsg + `",`)
-	json_buf.WriteString(`"data":`)
-	json_buf.WriteString(strVal)
-	json_buf.WriteString("}")
-
-	w.Header().Set("Connection", "close")
-	w.Header().Set("CharacterEncoding", "utf-8")
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Pragma", "no-cache")
-	w.Header().Set("Cache-Control", "no-cache, no-store, max-age=0")
-	w.Header().Set("Expires", "1L")
-
-	if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") && json_buf.Len() >= 1024 {
-		var gzbuf bytes.Buffer
-		gz := gzip.NewWriter(&gzbuf)
-		_, err = gz.Write(json_buf.Bytes())
-		gz.Close()
-		if err == nil {
-			w.Header().Set("Content-Encoding", "gzip")
-			w.Header().Set("Content-Length", strconv.Itoa(gzbuf.Len()))
-			w.Write(gzbuf.Bytes())
-		} else {
-			fmt.Println(err.Error())
-			w.Write(json_buf.Bytes())
-			return
-		}
-	} else {
-		w.Write(json_buf.Bytes())
-	}
-}
-*/
-//http://127.0.0.1/do?cmd=fee&param=w
-func ds(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	strCmd := r.Form.Get("cmd")
-	strSql := methodSql[strCmd]
-	for k, _ := range r.Form {
-		strSql = strings.Replace(strSql, "#"+k+"#", r.Form.Get(k), -1)
-	}
-
-	strRst := "-1"
-	strMsg := "error"
-	strVal := "null"
+	strVal := ""
 	var err error
 	var bufdata bytes.Buffer
 
@@ -223,8 +159,12 @@ func ds(w http.ResponseWriter, r *http.Request) {
 	var json_buf bytes.Buffer
 	json_buf.WriteString(`{"result":` + strRst + ",")
 	json_buf.WriteString(`"msg":"` + strMsg + `",`)
-	json_buf.Write(bufdata.Bytes()) //WriteString(`"data":`)
-	json_buf.WriteString(strVal)
+	json_buf.WriteString(`"data":`)
+	if "" == strVal {
+		json_buf.Write(bufdata.Bytes())
+	} else {
+		json_buf.WriteString(strVal)
+	}
 	json_buf.WriteString("}")
 
 	w.Header().Set("Connection", "close")

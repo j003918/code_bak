@@ -3,11 +3,7 @@ mysql_user{
 }
 
 oci8_dept{
-select 
---DEPT_CODE ,
-NAME ,
-USER_NAME
-from COMM.STAFF_DICT
+select * from COMM.MSG_CONTACTS
 }
 
 hisuser{
