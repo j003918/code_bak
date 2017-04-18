@@ -4,11 +4,9 @@ package sql2json
 import (
 	"bytes"
 	"database/sql"
-	//"database/sql/driver"
 	"errors"
 	"fmt"
 	"strings"
-	//"time"
 )
 
 func GetJson(db *sql.DB, strSql string) (string, error) {
