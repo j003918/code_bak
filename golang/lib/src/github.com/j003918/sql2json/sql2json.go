@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+/*
 func GetJson(db *sql.DB, strSql string) (string, error) {
 	var json_buf bytes.Buffer
 
@@ -70,4 +71,66 @@ func GetJson(db *sql.DB, strSql string) (string, error) {
 	}
 	json_buf.Bytes()[json_buf.Len()-1] = ']'
 	return json_buf.String(), nil
+}
+*/
+func GetJson(db *sql.DB, strSql string, out_buf *bytes.Buffer) error {
+	//var json_buf bytes.Buffer
+
+	if "" == strings.Trim(strSql, " ") {
+		return errors.New("err msg")
+	}
+
+	rows, err := db.Query(strSql)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	columns, err := rows.Columns()
+
+	if err != nil {
+		return err
+	}
+
+	//fix bug time.Time nil
+	//values := make([]sql.RawBytes, len(columns))
+	values := make([]sql.NullString, len(columns))
+	scans := make([]interface{}, len(columns))
+
+	for i := range values {
+		scans[i] = &values[i]
+	}
+
+	type Jitem struct {
+		Item string `json:"e"`
+	}
+	var jitem Jitem
+
+	out_buf.WriteByte('[')
+	for rows.Next() {
+		err = rows.Scan(scans...)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		out_buf.WriteByte('{')
+		var strVal string
+		for i, col := range values {
+			if !col.Valid {
+				strVal = "null"
+			} else {
+				jitem.Item = col.String
+				bs, _ := json.Marshal(&jitem)
+				strVal = string(bs[6 : len(bs)-2])
+			}
+
+			columName := strings.ToLower(columns[i])
+			cell := fmt.Sprintf(`"%v":"%v"`, columName, strVal)
+			out_buf.WriteString(cell + ",")
+		}
+		out_buf.Bytes()[out_buf.Len()-1] = '}'
+		out_buf.WriteByte(',')
+	}
+	out_buf.Bytes()[out_buf.Len()-1] = ']'
+	return nil
 }
