@@ -43,38 +43,31 @@ func GetJson(db *sql.DB, strSql string) (string, error) {
 	}
 	var jitem Jitem
 
-	json_buf.WriteString("[")
+	json_buf.WriteByte('[')
 	for rows.Next() {
 		err = rows.Scan(scans...)
 		if err != nil {
 			panic(err.Error())
 		}
 
-		row := "{"
+		json_buf.WriteByte('{')
 		var strVal string
 		for i, col := range values {
 			if !col.Valid {
 				strVal = "null"
 			} else {
-				jitem.Item = col.String //strings.Replace(col.String, string('\r'), " ", -1)
-				//strVal = strings.Replace(strVal, string('\n'), " ", -1)
+				jitem.Item = col.String
 				bs, _ := json.Marshal(&jitem)
 				strVal = string(bs[6 : len(bs)-2])
 			}
 
-			//Jitem.Item = strVal
-
 			columName := strings.ToLower(columns[i])
 			cell := fmt.Sprintf(`"%v":"%v"`, columName, strVal)
-			row = row + cell + ","
+			json_buf.WriteString(cell + ",")
 		}
-		row = row[0 : len(row)-1]
-		row += "}"
-		json_buf.WriteString(row + ",")
+		json_buf.Bytes()[json_buf.Len()-1] = '}'
+		json_buf.WriteByte(',')
 	}
-	strJson := json_buf.String()
-	strJson = strJson[0 : len(strJson)-1]
-	strJson += "]"
-
-	return strJson, nil
+	json_buf.Bytes()[json_buf.Len()-1] = ']'
+	return json_buf.String(), nil
 }
