@@ -89,6 +89,73 @@ func initDB() {
 	}
 }
 
+func test_mysql_sp() {
+	_, err := db.Query(MYSQL_SP_DROP)
+	_, err = db.Query(MYSQL_SP_CREATE)
+	if err != nil {
+		panic(err.Error())
+	}
+	stmt, err := db.Prepare(MYSQL_SP_EXEC)
+
+	if err != nil {
+		panic(err.Error())
+	}
+	defer stmt.Close()
+
+	n1, n2 := 3, 4
+	_, err = stmt.Exec(n1, n2)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	var sql string = "SELECT @out1 as out1,@out2 as out2"
+	selectInstance, err := db.Prepare(sql)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer selectInstance.Close()
+
+	var out1, out2 int
+	err = selectInstance.QueryRow().Scan(&out1, &out2)
+	if err != nil {
+		panic(err.Error())
+	}
+	fmt.Println(out1, out2)
+}
+
+func test_oci8_sp() {
+	_, err := db.Query(MYSQL_SP_CREATE)
+	if err != nil {
+		panic(err.Error())
+	}
+	stmt, err := db.Prepare(ORCLE_SP_EXEC)
+
+	if err != nil {
+		panic(err.Error())
+	}
+	defer stmt.Close()
+
+	n1, n2 := 3, 4
+	_, err = stmt.Exec(n1, n2)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	var sql string = "SELECT @out1 as out1,@out2 as out2"
+	selectInstance, err := db.Prepare(sql)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer selectInstance.Close()
+
+	var out1, out2 int
+	err = selectInstance.QueryRow().Scan(&out1, &out2)
+	if err != nil {
+		panic(err.Error())
+	}
+	fmt.Println(out1, out2)
+}
+
 func main() {
 	listen_addr := ":"
 	if "80" == cmdArgs["port"] && "1" == cmdArgs["tls"] {
@@ -104,6 +171,8 @@ func main() {
 	http.HandleFunc("/do", ds)
 	http.HandleFunc("/m/list", methodList)
 	http.HandleFunc("/m/del", methodDel)
+
+	//	test_mysql_sp()
 
 	if "1" == cmdArgs["tls"] {
 		panic(http.ListenAndServeTLS(listen_addr, "./ca/ca.crt", "./ca/ca.key", nil))
