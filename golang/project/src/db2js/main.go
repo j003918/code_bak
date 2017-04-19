@@ -12,10 +12,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/j003918/sql2json"
-
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/j003918/sql2json"
 	_ "github.com/mattn/go-oci8"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 var (
@@ -30,24 +30,26 @@ func init() {
 
 	tls := flag.Int("tls", 0, "0:disable 1:enable")
 	port := flag.Int("port", 80, "http:80 https:443")
-	str_DBDriver := flag.String("dbdriver", "mysql", "mysql:oci8")
-	str_DBHost := flag.String("dbhost", "127.0.0.1", "")
-	str_DBPort := flag.String("dbport", "3306", "")
-	str_DBUser := flag.String("dbuser", "root", "")
-	str_DBPass := flag.String("dbpass", "root", "")
-	str_DBName := flag.String("dbname", "mysql", "")
-	str_DBCharset := flag.String("dbcharset", "utf8", "")
+	strConf := flag.String("conf", "config.txt", "")
+	strDBDriver := flag.String("dbdriver", "mysql", "mysql:oci8")
+	strDBHost := flag.String("dbhost", "127.0.0.1", "")
+	strDBPort := flag.String("dbport", "3306", "")
+	strDBUser := flag.String("dbuser", "root", "")
+	strDBPass := flag.String("dbpass", "root", "")
+	strDBName := flag.String("dbname", "mysql", "")
+	strDBCharset := flag.String("dbcharset", "utf8", "")
 	flag.Parse()
 
 	cmdArgs["tls"] = strconv.Itoa(*tls)
 	cmdArgs["port"] = strconv.Itoa(*port)
-	cmdArgs["dbdriver"] = *str_DBDriver
-	cmdArgs["dbhost"] = *str_DBHost
-	cmdArgs["dbport"] = *str_DBPort
-	cmdArgs["dbuser"] = *str_DBUser
-	cmdArgs["dbpass"] = *str_DBPass
-	cmdArgs["dbname"] = *str_DBName
-	cmdArgs["dbcharset"] = *str_DBCharset
+	cmdArgs["conf"] = *strConf
+	cmdArgs["dbdriver"] = *strDBDriver
+	cmdArgs["dbhost"] = *strDBHost
+	cmdArgs["dbport"] = *strDBPort
+	cmdArgs["dbuser"] = *strDBUser
+	cmdArgs["dbpass"] = *strDBPass
+	cmdArgs["dbname"] = *strDBName
+	cmdArgs["dbcharset"] = *strDBCharset
 
 	update_config()
 	initDB()
@@ -72,6 +74,8 @@ func initDB() {
 	case "oci8":
 		os.Setenv("NLS_LANG", "AMERICAN_AMERICA.AL32UTF8")
 		strDSN += cmdArgs["dbuser"] + "/" + cmdArgs["dbpass"] + "@" + cmdArgs["dbname"]
+	case "sqlite3":
+		strDSN += cmdArgs["dbname"]
 	default:
 	}
 
@@ -80,8 +84,8 @@ func initDB() {
 		panic(err.Error())
 	}
 
-	db.SetMaxOpenConns(100)
-	db.SetMaxIdleConns(50)
+	db.SetMaxOpenConns(80)
+	db.SetMaxIdleConns(20)
 
 	err = db.Ping()
 	if err != nil {

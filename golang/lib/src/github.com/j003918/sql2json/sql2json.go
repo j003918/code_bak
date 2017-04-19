@@ -68,6 +68,10 @@ func GetJson(db *sql.DB, strSql string, out_buf *bytes.Buffer) error {
 		out_buf.Bytes()[out_buf.Len()-1] = '}'
 		out_buf.WriteByte(',')
 	}
-	out_buf.Bytes()[out_buf.Len()-1] = ']'
+	if out_buf.Len() > 1 {
+		out_buf.Bytes()[out_buf.Len()-1] = ']'
+	} else {
+		out_buf.WriteByte(']')
+	}
 	return nil
 }

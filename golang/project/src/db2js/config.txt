@@ -6,6 +6,7 @@ oci8_dept{
 select * from COMM.MSG_CONTACTS
 }
 
+
 hisuser{
 select 
 *

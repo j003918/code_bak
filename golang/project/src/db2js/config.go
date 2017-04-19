@@ -12,9 +12,8 @@ import (
 	//	_ "github.com/mattn/go-sqlite3"
 )
 
-const CFG_FILE_REFRESH = 30
+//const CFG_FILE_REFRESH = 30
 
-var CFG_FILE_NAME string = "config.txt"
 var CFG_DB string = "bd.gfc"
 var (
 	str_t_syscfg_db_type = `		
@@ -63,7 +62,7 @@ func ReloadConfig(sec time.Duration) {
 func test_sqlite() {
 	//os.Remove(CFG_DB)
 
-	db, err := sql.Open("sqlite3", CFG_DB)
+	db, err := sql.Open("sqlite3", cmdArgs["dbname"])
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -113,8 +112,9 @@ func test_sqlite() {
 }
 */
 func update_config() {
-	f, err := os.Open(CFG_FILE_NAME)
+	f, err := os.Open(cmdArgs["conf"])
 	if err != nil {
+		fmt.Println(err.Error())
 		return
 	}
 	defer f.Close()
