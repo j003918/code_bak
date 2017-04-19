@@ -30,12 +30,12 @@ func init() {
 
 	tls := flag.Int("tls", 0, "0:disable 1:enable")
 	port := flag.Int("port", 80, "http:80 https:443")
-	str_DBDriver := flag.String("dbdriver", "oci8", "mysql:oci8")
-	str_DBHost := flag.String("dbhost", "130.1.10.230", "")
+	str_DBDriver := flag.String("dbdriver", "mysql", "mysql:oci8")
+	str_DBHost := flag.String("dbhost", "127.0.0.1", "")
 	str_DBPort := flag.String("dbport", "3306", "")
-	str_DBUser := flag.String("dbuser", "system", "")
-	str_DBPass := flag.String("dbpass", "manager", "")
-	str_DBName := flag.String("dbname", "his", "")
+	str_DBUser := flag.String("dbuser", "root", "")
+	str_DBPass := flag.String("dbpass", "root", "")
+	str_DBName := flag.String("dbname", "mysql", "")
 	str_DBCharset := flag.String("dbcharset", "utf8", "")
 	flag.Parse()
 
