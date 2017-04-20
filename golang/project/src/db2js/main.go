@@ -4,6 +4,7 @@ package main
 import (
 	"bytes"
 	"compress/gzip"
+	"context"
 	"database/sql"
 	"flag"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/j003918/sql2json"
@@ -131,6 +133,8 @@ func methodList(w http.ResponseWriter, r *http.Request) {
 
 //http://127.0.0.1/do?cmd=fee&param=w
 func ds(w http.ResponseWriter, r *http.Request) {
+	timeout := 30 * time.Second
+
 	r.ParseForm()
 	strCmd := r.Form.Get("cmd")
 	strSql := methodSql[strCmd]
@@ -149,7 +153,8 @@ func ds(w http.ResponseWriter, r *http.Request) {
 		strMsg = "cmd or param error"
 		strVal = "null"
 	} else {
-		err = sql2json.GetJson(db, strSql, &bufdata)
+		ctx, _ := context.WithTimeout(context.Background(), timeout)
+		err = sql2json.GetJson(ctx, db, strSql, &bufdata)
 		if nil != err {
 			strRst = "-1"
 			strMsg = err.Error()

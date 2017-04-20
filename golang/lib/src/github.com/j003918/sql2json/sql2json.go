@@ -3,6 +3,7 @@ package sql2json
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -10,9 +11,7 @@ import (
 	"strings"
 )
 
-func GetJson(db *sql.DB, strSql string, out_buf *bytes.Buffer) error {
-	//var json_buf bytes.Buffer
-
+func GetJson(ctx context.Context, db *sql.DB, strSql string, out_buf *bytes.Buffer) error {
 	if "" == strings.Trim(strSql, " ") {
 		return errors.New("err msg")
 	}
@@ -73,5 +72,12 @@ func GetJson(db *sql.DB, strSql string, out_buf *bytes.Buffer) error {
 	} else {
 		out_buf.WriteByte(']')
 	}
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+	}
+
 	return nil
 }
