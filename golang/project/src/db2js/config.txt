@@ -1,5 +1,5 @@
 mysql_user{
-	select * from zyyoutdoor.t_ris_report where patient_id='#pid#'
+	select * from t_ris_report limit 1000
 }
 
 oci8_dept{
@@ -14,8 +14,6 @@ from COMM.STAFF_DICT
 --order by CREATE_DATE
 }
 
-job{
-select 
-status
-from COMM.STAFF_DICT
+oo{
+	select *  from test.his_01 where user_name='#un#'
 }

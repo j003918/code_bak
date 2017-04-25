@@ -12,6 +12,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -21,9 +22,11 @@ import (
 )
 
 var (
-	db        *sql.DB
-	methodSql map[string]string
-	cmdArgs   map[string]string
+	db         *sql.DB
+	methodSql  map[string]string
+	cmdArgs    map[string]string
+	curReqNum  = 0
+	curReqLock sync.Mutex
 )
 
 func init() {
@@ -107,9 +110,14 @@ func main() {
 	go ReloadConfig(30)
 
 	http.Handle("/", http.FileServer(http.Dir("./html/")))
-	http.HandleFunc("/do", ds)
-	http.HandleFunc("/m/list", methodList)
-	http.HandleFunc("/m/del", methodDel)
+
+	http.HandleFunc("/req", worker)
+
+	http.HandleFunc("/info/service", listMethod)
+	http.HandleFunc("/info/online", activeCount)
+
+	http.HandleFunc("/cfg", setConfig)
+	http.HandleFunc("/m/del", delMethod)
 
 	if "1" == cmdArgs["tls"] {
 		panic(http.ListenAndServeTLS(listen_addr, "./ca/ca.crt", "./ca/ca.key", nil))
@@ -118,12 +126,21 @@ func main() {
 	}
 }
 
-func methodDel(w http.ResponseWriter, r *http.Request) {
+func setConfig(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	cfgKey := r.Form.Get("k")
+	cfgVal := r.Form.Get("v")
+	if _, ok := cmdArgs[cfgKey]; ok {
+		cmdArgs[cfgKey] = cfgVal
+	}
+}
+
+func delMethod(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	delete(methodSql, r.Form.Get("m"))
 }
 
-func methodList(w http.ResponseWriter, r *http.Request) {
+func listMethod(w http.ResponseWriter, r *http.Request) {
 	strTmp := ""
 	for k, v := range methodSql {
 		strTmp += k + "{" + string('\n') + v + string('\n') + "}" + strings.Repeat(string('\n'), 2)
@@ -131,12 +148,29 @@ func methodList(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(strTmp))
 }
 
-//http://127.0.0.1/do?cmd=fee&param=w
-func ds(w http.ResponseWriter, r *http.Request) {
-	timeout := 30 * time.Second
+func activeCount(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(strconv.Itoa(curReqNum)))
+}
 
+func reqin() {
+	curReqLock.Lock()
+	curReqNum++
+	curReqLock.Unlock()
+}
+
+func reqout() {
+	curReqLock.Lock()
+	curReqNum--
+	curReqLock.Unlock()
+}
+
+//http://127.0.0.1/do?cmd=fee&param=w
+func worker(w http.ResponseWriter, r *http.Request) {
+	reqin()
+	defer reqout()
+	timeout := 30 * time.Second
 	r.ParseForm()
-	strCmd := r.Form.Get("cmd")
+	strCmd := r.Form.Get("m")
 	strSql := methodSql[strCmd]
 	for k, _ := range r.Form {
 		strSql = strings.Replace(strSql, "#"+k+"#", r.Form.Get(k), -1)
