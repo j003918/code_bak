@@ -114,7 +114,7 @@ func main() {
 	http.HandleFunc("/get", worker)
 
 	http.HandleFunc("/info/service", listMethod)
-	http.HandleFunc("/info/online", activeCount)
+	http.HandleFunc("/info/online", activeGuest)
 
 	http.HandleFunc("/cfg", setConfig)
 	http.HandleFunc("/m/del", delMethod)
@@ -148,17 +148,17 @@ func listMethod(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(strTmp))
 }
 
-func activeCount(w http.ResponseWriter, r *http.Request) {
+func activeGuest(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(strconv.Itoa(curReqNum)))
 }
 
-func workerIn() {
+func incGuest() {
 	curReqLock.Lock()
 	curReqNum++
 	curReqLock.Unlock()
 }
 
-func workerOut() {
+func decGuest() {
 	curReqLock.Lock()
 	curReqNum--
 	curReqLock.Unlock()
@@ -166,8 +166,8 @@ func workerOut() {
 
 //http://127.0.0.1/get?m=fee&param=w
 func worker(w http.ResponseWriter, r *http.Request) {
-	workerIn()
-	defer workerOut()
+	incGuest()
+	defer decGuest()
 	timeout := 30 * time.Second
 	r.ParseForm()
 	strCmd := r.Form.Get("m")
