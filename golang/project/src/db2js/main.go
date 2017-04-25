@@ -111,7 +111,7 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir("./html/")))
 
-	http.HandleFunc("/req", worker)
+	http.HandleFunc("/get", worker)
 
 	http.HandleFunc("/info/service", listMethod)
 	http.HandleFunc("/info/online", activeCount)
@@ -152,22 +152,22 @@ func activeCount(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(strconv.Itoa(curReqNum)))
 }
 
-func reqin() {
+func workerIn() {
 	curReqLock.Lock()
 	curReqNum++
 	curReqLock.Unlock()
 }
 
-func reqout() {
+func workerOut() {
 	curReqLock.Lock()
 	curReqNum--
 	curReqLock.Unlock()
 }
 
-//http://127.0.0.1/do?cmd=fee&param=w
+//http://127.0.0.1/get?m=fee&param=w
 func worker(w http.ResponseWriter, r *http.Request) {
-	reqin()
-	defer reqout()
+	workerIn()
+	defer workerOut()
 	timeout := 30 * time.Second
 	r.ParseForm()
 	strCmd := r.Form.Get("m")
