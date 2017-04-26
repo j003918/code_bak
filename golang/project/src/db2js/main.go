@@ -10,13 +10,16 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/j003918/sql2json"
+
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/mattn/go-oci8"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -119,10 +122,35 @@ func main() {
 	http.HandleFunc("/cfg", setConfig)
 	http.HandleFunc("/m/del", delMethod)
 
-	if "1" == cmdArgs["tls"] {
-		panic(http.ListenAndServeTLS(listen_addr, "./ca/ca.crt", "./ca/ca.key", nil))
-	} else {
-		panic(http.ListenAndServe(listen_addr, nil))
+	s := &http.Server{
+		Addr:           listen_addr,
+		Handler:        http.DefaultServeMux,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+
+	go func() {
+		if "1" == cmdArgs["tls"] {
+			fmt.Println(s.ListenAndServeTLS("./ca/ca.crt", "./ca/ca.key"))
+		} else {
+			fmt.Println(s.ListenAndServe())
+		}
+
+		fmt.Println("server shutdown")
+
+	}()
+
+	ch := make(chan os.Signal)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+	_ = <-ch
+
+	fmt.Println("server shutting down......")
+	//Wait gorotine print shutdown message
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	s.Shutdown(ctx)
+	if nil != ctx.Err() {
+		fmt.Println(ctx.Err().Error())
 	}
 }
 
