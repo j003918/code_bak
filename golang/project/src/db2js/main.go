@@ -136,15 +136,12 @@ func main() {
 		} else {
 			fmt.Println(s.ListenAndServe())
 		}
-
 		fmt.Println("server shutdown")
-
 	}()
 
 	ch := make(chan os.Signal)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 	_ = <-ch
-
 	fmt.Println("server shutting down......")
 	//Wait gorotine print shutdown message
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
