@@ -22,7 +22,7 @@ var (
 			user_pass 	VARCHAR(128) NOT NULL,
 			user_sign	VARCHAR(32) DEFAULT NULL,
 			trustzone	VARCHAR(256) DEFAULT NULL,
-			user_status	INTEGER DEFAULT 0 NOT NULL,
+			user_status	INTEGER DEFAULT 1 NOT NULL,
 			last_login 	DATETIME DEFAULT NULL,
 			create_time DATETIME DEFAULT(DATETIME('now', 'localtime')) NOT NULL
 		);`
@@ -30,6 +30,21 @@ var (
 	sysTab_sys_user_add     = `insert into sys_user(user_id,user_pass) values(?,?)`
 	sysTab_sys_user_Login   = `update sys_user set last_login=DATETIME('now', 'localtime') where user_id=? and user_pass=?`
 	sysTab_sys_user_SetPass = `update sys_user set user_pass=? where user_id=? and user_pass=?`
+
+	SysTabCreate_sys_cfg = `		
+		CREATE TABLE IF NOT EXISTS sys_method 
+		(
+			--id 			INTEGER PRIMARY KEY AUTOINCREMENT,
+			method_name		VARCHAR(128) PRIMARY KEY NOT NULL,
+			method_content 	VARCHAR(128) NOT NULL,
+			dbdriver		VARCHAR(32) DEFAULT NULL,
+			update_time 	DATETIME DEFAULT NULL,
+			create_time 	DATETIME DEFAULT(DATETIME('now', 'localtime')) NOT NULL
+		);`
+	sysTab_sys_method_list         = `select method_name,method_content,dbdriver from sys_method`
+	sysTab_sys_method_add          = `insert into sys_method(method_name,method_content,dbdriver) values(?,?,?)`
+	sysTab_sys_method_Content_Set  = `update sys_method set method_content=? where method_name=?`
+	sysTab_sys_method_Dbdriver_set = `update sys_method set dbdriver=? where method_name=?`
 )
 
 func init() {
@@ -44,10 +59,10 @@ func init() {
 
 	AddUser("jhf", "123")
 	AddUser("tf", "tfpass")
-	listuser()
+	printab(sysTab_sys_user_list)
 
 	ChangeUserPass("jhf", "123", "3456")
-	listuser()
+	printab(sysTab_sys_user_list)
 
 }
 
@@ -56,68 +71,46 @@ func str2md5(str string) string {
 	return hex.EncodeToString(sum[:])
 }
 
-func AddUser(id, pass string) bool {
-	stmt, err := sysCfgDb.Prepare(sysTab_sys_user_add)
+func modifydb(strsql string, args ...interface{}) (RowsAffected int64, ok bool) {
+	stmt, err := sysCfgDb.Prepare(strsql)
 	if nil != err {
 		fmt.Println(err.Error())
-		return false
+		return -1, false
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(id, str2md5(id+pass))
+	rst, err := stmt.Exec(args...)
 	if nil != err {
-		return true
+		fmt.Println(err.Error())
+		return -1, false
 	}
-	return false
+
+	count, err := rst.RowsAffected()
+	if nil != err {
+		fmt.Println(err.Error())
+		return -1, false
+	}
+
+	return count, true
+}
+
+func AddUser(id, pass string) bool {
+	_, ok := modifydb(sysTab_sys_user_add, id, str2md5(id+pass))
+	return ok
 }
 
 func CheckUser(id, pass string) bool {
-	stmt, err := sysCfgDb.Prepare(sysTab_sys_user_Login)
-	if nil != err {
-		fmt.Println(err.Error())
-		return false
-	}
-	defer stmt.Close()
-
-	rst, err := stmt.Exec(id, str2md5(id+pass))
-	count, _ := rst.RowsAffected()
-	if 1 == count {
-		return true
-	}
-
-	return false
+	count, ok := modifydb(sysTab_sys_user_Login, id, str2md5(id+pass))
+	return ok && count == 1
 }
 
 func ChangeUserPass(id, pass, newPass string) bool {
-	stmt, err := sysCfgDb.Prepare(sysTab_sys_user_SetPass)
-	if nil != err {
-		fmt.Println(err.Error())
-		return false
-	}
-	defer stmt.Close()
-
-	rst, err := stmt.Exec(str2md5(id+newPass), id, str2md5(id+pass))
-	if nil != err {
-		fmt.Println(err.Error())
-		return false
-	}
-	count, err := rst.RowsAffected()
-
-	if nil != err {
-		fmt.Println(err.Error())
-		return false
-	}
-
-	if 1 == count {
-		fmt.Println("change pass ok")
-		return true
-	}
-
-	return false
+	count, ok := modifydb(sysTab_sys_user_SetPass, str2md5(id+newPass), id, str2md5(id+pass))
+	return ok && count == 1
 }
 
-func listuser() {
-	rows, err := sysCfgDb.Query(sysTab_sys_user_list)
+func printab(strsql string) {
+	rows, err := sysCfgDb.Query(strsql)
 	if err != nil {
 		return
 	}
