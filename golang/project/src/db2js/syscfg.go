@@ -76,13 +76,13 @@ func chekError(err error, output bool) bool {
 		if output {
 			fmt.Println(err.Error())
 		}
-		return false
+		return true
 	}
-	return true
+	return false
 }
 
-func PrinTab(db *sql.DB, strsql string, args ...interface{}) {
-	stmt, err := sysCfgDb.Prepare(strsql)
+func PrinTab(mydb *sql.DB, strsql string, args ...interface{}) {
+	stmt, err := mydb.Prepare(strsql)
 	if chekError(err, true) {
 		return
 	}
@@ -97,6 +97,7 @@ func PrinTab(db *sql.DB, strsql string, args ...interface{}) {
 	if chekError(err, true) {
 		return
 	}
+	defer rows.Close()
 
 	//fix bug time.Time nil
 	//values := make([]sql.RawBytes, len(columns))
@@ -127,8 +128,8 @@ func PrinTab(db *sql.DB, strsql string, args ...interface{}) {
 }
 
 //for insert update delete use
-func ModifyTab(db *sql.DB, strsql string, args ...interface{}) (RowsAffected int64, ok bool) {
-	stmt, err := sysCfgDb.Prepare(strsql)
+func ModifyTab(mydb *sql.DB, strsql string, args ...interface{}) (RowsAffected int64, ok bool) {
+	stmt, err := mydb.Prepare(strsql)
 	if chekError(err, true) {
 		return -1, false
 	}
