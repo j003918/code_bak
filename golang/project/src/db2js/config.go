@@ -5,11 +5,9 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	//	"log"
 	"os"
 	"strings"
 	"time"
-	//	_ "github.com/mattn/go-sqlite3"
 )
 
 //const CFG_FILE_REFRESH = 30
@@ -17,11 +15,11 @@ import (
 var CFG_DB string = "bd.gfc"
 var (
 	str_t_syscfg_db_type = `		
-		CREATE TABLE IF NOT EXISTS syscfg_db_type 
+		CREATE TABLE IF NOT EXISTS sys_user 
 		(
-			type_id integer PRIMARY KEY autoincrement,
-			type_name varchar(50),
-			drive_name varchar(50),
+			user_id integer PRIMARY KEY autoincrement,
+			user_name varchar(128),
+			user_pass varchar(128),
 			status integer default 0,
 			create_time datetime default(datetime('now', 'localtime'))
 		);`

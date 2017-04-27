@@ -119,6 +119,8 @@ func main() {
 	http.HandleFunc("/info/service", listMethod)
 	http.HandleFunc("/info/online", activeGuest)
 
+	http.HandleFunc("/auth/login", guestlogin)
+
 	http.HandleFunc("/cfg", setConfig)
 	http.HandleFunc("/m/del", delMethod)
 
@@ -149,6 +151,10 @@ func main() {
 	if nil != ctx.Err() {
 		fmt.Println(ctx.Err().Error())
 	}
+}
+
+func guestlogin(w http.ResponseWriter, r *http.Request) {
+	AddAuth(r.Host, "")
 }
 
 func setConfig(w http.ResponseWriter, r *http.Request) {
@@ -193,6 +199,12 @@ func decGuest() {
 func worker(w http.ResponseWriter, r *http.Request) {
 	incGuest()
 	defer decGuest()
+	if !CheckAuth(r.Host, "") {
+		strJson := `{"result":"` + Code401 + `",` + `"msg":"` + Code401Msg + `", "data": null}`
+		w.Write([]byte(strJson))
+		return
+	}
+
 	timeout := 30 * time.Second
 	r.ParseForm()
 	strCmd := r.Form.Get("m")
@@ -201,26 +213,26 @@ func worker(w http.ResponseWriter, r *http.Request) {
 		strSql = strings.Replace(strSql, "#"+k+"#", r.Form.Get(k), -1)
 	}
 
-	strRst := "-1"
-	strMsg := "error"
+	strRst := Code400
+	strMsg := Code400Msg
 	strVal := ""
 	var err error
 	var bufdata bytes.Buffer
 
 	if strCmd == "" || strSql == "" || strings.ContainsAny(strSql, "#") {
-		strRst = "-1"
-		strMsg = "cmd or param error"
+		strRst = Code400
+		strMsg = Code400Msg
 		strVal = "null"
 	} else {
 		ctx, _ := context.WithTimeout(context.Background(), timeout)
 		err = sql2json.GetJson(ctx, db, strSql, &bufdata)
 		if nil != err {
-			strRst = "-1"
+			strRst = Code500
 			strMsg = err.Error()
 			strVal = "null"
 		} else {
-			strRst = "0"
-			strMsg = "ok"
+			strRst = Code200
+			strMsg = Code200Msg
 		}
 	}
 

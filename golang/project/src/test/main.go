@@ -1,46 +1,36 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"time"
+	//	"fmt"
+	//"strconv"
+	//"crypto/md5"
+	//"encoding/hex"
+	//"time"
+	"github.com/j003918/datastruct/safemap"
 )
 
-func Add(ctx context.Context, a, b int) int {
-	time.Sleep(5 * time.Second)
-	select {
-	case <-ctx.Done():
-		return -1
-	default:
+func delKey(val interface{}) bool {
+	if val.(int) > 5 {
+		return true
 	}
-	return a + b
+	return false
 }
 
 func main() {
-	{
-		a := 3
-		b := 6
-		timeout := 6 * time.Second
-		ctx, _ := context.WithTimeout(context.Background(), timeout)
-		res := Add(ctx, a, b)
-		if nil != ctx.Err() {
-			fmt.Println(ctx.Err().Error())
-		}
-		fmt.Printf("%d+%d=%d\n", a, b, res)
+	aa := safemap.NewSafeMap()
+	for i := 0; i < 10; i++ {
+		aa.Set(i, i)
 	}
+	aa.Println()
+	aa.RangeDel(delKey)
+	aa.Println()
 
-	{
-		a := 1
-		b := 2
-		ctx, cancel := context.WithCancel(context.Background())
-		go func() {
-			time.Sleep(2 * time.Second)
-			cancel()
-		}()
-		res := Add(ctx, 1, 2)
-		if nil != ctx.Err() {
-			fmt.Println(ctx.Err().Error())
-		}
-		fmt.Printf("%d+%d=%d\n", a, b, res)
-	}
+	st := time.Now().Unix()
+	time.Sleep(3 * time.Second)
+	et := time.Now().Unix()
+
+	fmt.Println(st, et, (et - st))
+
 }
