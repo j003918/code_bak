@@ -48,9 +48,9 @@ var (
 )
 
 func init() {
-	sysCfgDb, sysDbErr = sql.Open("sqlite3", DbName)
-	if sysDbErr != nil {
-		panic(sysDbErr)
+	sysCfgDb = OpenDb("sqlite3", DbName)
+	if sysCfgDb == nil {
+		panic("open db error")
 	}
 	_, sysDbErr := sysCfgDb.Exec(SysTabCreate_sys_user)
 	if nil != sysDbErr {
@@ -63,7 +63,6 @@ func init() {
 
 	ChangeUserPass("jhf", "123", "3456")
 	PrinTab(sysCfgDb, sysTab_sys_user_list)
-
 }
 
 func str2md5(str string) string {
@@ -79,6 +78,15 @@ func chekError(err error, output bool) bool {
 		return true
 	}
 	return false
+}
+
+func OpenDb(driver, dsn string) *sql.DB {
+	mydb, err := sql.Open(driver, dsn)
+	if chekError(err, true) {
+		return nil
+	}
+
+	return mydb
 }
 
 func PrinTab(mydb *sql.DB, strsql string, args ...interface{}) {
