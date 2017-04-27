@@ -71,23 +71,76 @@ func str2md5(str string) string {
 	return hex.EncodeToString(sum[:])
 }
 
+func chekError(err error, output bool) bool {
+	if err != nil {
+		if output {
+			fmt.Println(err.Error())
+		}
+		return false
+	}
+	return true
+}
+
+func printab(strsql string, args ...interface{}) {
+	stmt, err := sysCfgDb.Prepare(strsql)
+	if chekError(err, true) {
+		return
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(args...)
+	if chekError(err, true) {
+		return
+	}
+
+	columns, err := rows.Columns()
+	if chekError(err, true) {
+		return
+	}
+
+	//fix bug time.Time nil
+	//values := make([]sql.RawBytes, len(columns))
+	values := make([]sql.NullString, len(columns))
+	scans := make([]interface{}, len(columns))
+
+	for i := range values {
+		scans[i] = &values[i]
+	}
+
+	for rows.Next() {
+		err = rows.Scan(scans...)
+		if chekError(err, true) {
+			return
+		}
+
+		strVal := ""
+		for _, col := range values {
+			if !col.Valid {
+				strVal = "NULL"
+			} else {
+				strVal = col.String
+			}
+			fmt.Printf(strVal, " ")
+		}
+		fmt.Println()
+	}
+}
+
+//for insert update delete use
 func modifydb(strsql string, args ...interface{}) (RowsAffected int64, ok bool) {
 	stmt, err := sysCfgDb.Prepare(strsql)
-	if nil != err {
-		fmt.Println(err.Error())
+	if chekError(err, true) {
 		return -1, false
 	}
 	defer stmt.Close()
 
 	rst, err := stmt.Exec(args...)
-	if nil != err {
-		fmt.Println(err.Error())
+	if chekError(err, true) {
 		return -1, false
 	}
 
 	count, err := rst.RowsAffected()
-	if nil != err {
-		fmt.Println(err.Error())
+	if chekError(err, true) {
 		return -1, false
 	}
 
@@ -107,45 +160,4 @@ func CheckUser(id, pass string) bool {
 func ChangeUserPass(id, pass, newPass string) bool {
 	count, ok := modifydb(sysTab_sys_user_SetPass, str2md5(id+newPass), id, str2md5(id+pass))
 	return ok && count == 1
-}
-
-func printab(strsql string) {
-	rows, err := sysCfgDb.Query(strsql)
-	if err != nil {
-		return
-	}
-	defer rows.Close()
-
-	columns, err := rows.Columns()
-
-	if err != nil {
-		return
-	}
-
-	//fix bug time.Time nil
-	//values := make([]sql.RawBytes, len(columns))
-	values := make([]sql.NullString, len(columns))
-	scans := make([]interface{}, len(columns))
-
-	for i := range values {
-		scans[i] = &values[i]
-	}
-
-	for rows.Next() {
-		err = rows.Scan(scans...)
-		if err != nil {
-			panic(err.Error())
-		}
-
-		strVal := ""
-		for _, col := range values {
-			if !col.Valid {
-				strVal = "NULL"
-			} else {
-				strVal = col.String
-			}
-			fmt.Printf(strVal, " ")
-		}
-		fmt.Println()
-	}
 }
