@@ -48,14 +48,13 @@ var (
 )
 
 func init() {
+
 	sysCfgDb = OpenDb("sqlite3", DbName)
 	if sysCfgDb == nil {
 		panic("open db error")
 	}
-	_, sysDbErr := sysCfgDb.Exec(SysTabCreate_sys_user)
-	if nil != sysDbErr {
-		fmt.Println(sysDbErr.Error())
-	}
+
+	ModifyTab(sysCfgDb, SysTabCreate_sys_user)
 
 	AddUser("jhf", "123")
 	AddUser("tf", "tfpass")
