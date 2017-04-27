@@ -59,10 +59,10 @@ func init() {
 
 	AddUser("jhf", "123")
 	AddUser("tf", "tfpass")
-	printab(sysTab_sys_user_list)
+	PrinTab(sysCfgDb, sysTab_sys_user_list)
 
 	ChangeUserPass("jhf", "123", "3456")
-	printab(sysTab_sys_user_list)
+	PrinTab(sysCfgDb, sysTab_sys_user_list)
 
 }
 
@@ -81,7 +81,7 @@ func chekError(err error, output bool) bool {
 	return true
 }
 
-func printab(strsql string, args ...interface{}) {
+func PrinTab(db *sql.DB, strsql string, args ...interface{}) {
 	stmt, err := sysCfgDb.Prepare(strsql)
 	if chekError(err, true) {
 		return
@@ -127,7 +127,7 @@ func printab(strsql string, args ...interface{}) {
 }
 
 //for insert update delete use
-func modifydb(strsql string, args ...interface{}) (RowsAffected int64, ok bool) {
+func ModifyTab(db *sql.DB, strsql string, args ...interface{}) (RowsAffected int64, ok bool) {
 	stmt, err := sysCfgDb.Prepare(strsql)
 	if chekError(err, true) {
 		return -1, false
@@ -148,16 +148,16 @@ func modifydb(strsql string, args ...interface{}) (RowsAffected int64, ok bool) 
 }
 
 func AddUser(id, pass string) bool {
-	_, ok := modifydb(sysTab_sys_user_add, id, str2md5(id+pass))
+	_, ok := ModifyTab(sysCfgDb, sysTab_sys_user_add, id, str2md5(id+pass))
 	return ok
 }
 
 func CheckUser(id, pass string) bool {
-	count, ok := modifydb(sysTab_sys_user_Login, id, str2md5(id+pass))
+	count, ok := ModifyTab(sysCfgDb, sysTab_sys_user_Login, id, str2md5(id+pass))
 	return ok && count == 1
 }
 
 func ChangeUserPass(id, pass, newPass string) bool {
-	count, ok := modifydb(sysTab_sys_user_SetPass, str2md5(id+newPass), id, str2md5(id+pass))
+	count, ok := ModifyTab(sysCfgDb, sysTab_sys_user_SetPass, str2md5(id+newPass), id, str2md5(id+pass))
 	return ok && count == 1
 }
