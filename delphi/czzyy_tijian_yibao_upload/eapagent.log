@@ -1,0 +1,189 @@
+2017-04-28 18:39:44==>INFORMATION: ****************************************************************
+2017-04-28 18:39:44==>INFORMATION: eapagent.dll开始初始化：
+2017-04-28 18:39:44==>INFORMATION: eapagent.dll初始化成功！
+
+2017-04-28 18:39:44==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:39:44==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:39:44==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=9100^0010^7122^^20170428183944-0010-0001^0000^^1^68F72884C749|80|^
+2017-04-28 18:39:44==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:39:44==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>0</appCode><errorMessage briefMessage="" detailMessage=""/></header><body><parameters><parameter paraName="outputData" paraValue="20170428183607-00000010-4679^00000010-7122-201704281836074678^^"/><parameter paraName="writeCardInfo" paraValue=""/></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:39:44==>DEBUG: 远程请求结束
+2017-04-28 18:39:44==>DEBUG: 开始解析XML
+2017-04-28 18:39:44==>DEBUG: 解析XML结束
+2017-04-28 18:40:04==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:40:04==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:40:04==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=6002^0010^7122^^20170428184004-0010-0002^0000^0010|姓名|现居住地址|体检档案
+编号|村民小组|外科|五官科|实验室检查|胸透|B超|心电图|医院专家结论建议|是否医保卡|内科|备注|^1^68F72884C749|80|^
+2017-04-28 18:40:04==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:40:04==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>1</appCode><errorMessage briefMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^" detailMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^"/></header><body><parameters></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:40:04==>DEBUG: 远程请求结束
+2017-04-28 18:40:04==>DEBUG: 开始解析XML
+2017-04-28 18:40:04==>DEBUG: 解析XML结束
+2017-04-28 18:40:04==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:40:04==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:40:04==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=6002^0010^7122^^20170428184004-0010-0003^0000^0010|姓名|现居住地址|体检档案
+编号|村民小组|外科|五官科|实验室检查|胸透|B超|心电图|医院专家结论建议|是否医保卡|内科|备注|^1^68F72884C749|80|^
+2017-04-28 18:40:04==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:40:04==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>1</appCode><errorMessage briefMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^" detailMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^"/></header><body><parameters></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:40:04==>DEBUG: 远程请求结束
+2017-04-28 18:40:04==>DEBUG: 开始解析XML
+2017-04-28 18:40:04==>DEBUG: 解析XML结束
+2017-04-28 18:40:04==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:40:04==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:40:04==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=6002^0010^7122^^20170428184004-0010-0004^0000^0010|姓名|现居住地址|体检档案
+编号|村民小组|外科|五官科|实验室检查|胸透|B超|心电图|医院专家结论建议|是否医保卡|内科|备注|^1^68F72884C749|80|^
+2017-04-28 18:40:04==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:40:04==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>1</appCode><errorMessage briefMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^" detailMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^"/></header><body><parameters></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:40:04==>DEBUG: 远程请求结束
+2017-04-28 18:40:04==>DEBUG: 开始解析XML
+2017-04-28 18:40:04==>DEBUG: 解析XML结束
+2017-04-28 18:40:04==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:40:04==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:40:04==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=6002^0010^7122^^20170428184004-0010-0005^0000^0010|姓名|现居住地址|体检档案
+编号|村民小组|外科|五官科|实验室检查|胸透|B超|心电图|医院专家结论建议|是否医保卡|内科|备注|^1^68F72884C749|80|^
+2017-04-28 18:40:04==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:40:04==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>1</appCode><errorMessage briefMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^" detailMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^"/></header><body><parameters></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:40:04==>DEBUG: 远程请求结束
+2017-04-28 18:40:04==>DEBUG: 开始解析XML
+2017-04-28 18:40:04==>DEBUG: 解析XML结束
+2017-04-28 18:40:04==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:40:04==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:40:04==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=6002^0010^7122^^20170428184004-0010-0006^0000^0010|姓名|现居住地址|体检档案
+编号|村民小组|外科|五官科|实验室检查|胸透|B超|心电图|医院专家结论建议|是否医保卡|内科|备注|^1^68F72884C749|80|^
+2017-04-28 18:40:04==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:40:04==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>1</appCode><errorMessage briefMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^" detailMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^"/></header><body><parameters></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:40:04==>DEBUG: 远程请求结束
+2017-04-28 18:40:04==>DEBUG: 开始解析XML
+2017-04-28 18:40:04==>DEBUG: 解析XML结束
+2017-04-28 18:40:04==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:40:04==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:40:04==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=6002^0010^7122^^20170428184004-0010-0007^0000^0010|姓名|现居住地址|体检档案
+编号|村民小组|外科|五官科|实验室检查|胸透|B超|心电图|医院专家结论建议|是否医保卡|内科|备注|^1^68F72884C749|80|^
+2017-04-28 18:40:04==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:40:04==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>1</appCode><errorMessage briefMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^" detailMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^"/></header><body><parameters></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:40:04==>DEBUG: 远程请求结束
+2017-04-28 18:40:04==>DEBUG: 开始解析XML
+2017-04-28 18:40:04==>DEBUG: 解析XML结束
+2017-04-28 18:40:04==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:40:04==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:40:04==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=6002^0010^7122^^20170428184004-0010-0008^0000^0010|姓名|现居住地址|体检档案
+编号|村民小组|外科|五官科|实验室检查|胸透|B超|心电图|医院专家结论建议|是否医保卡|内科|备注|^1^68F72884C749|80|^
+2017-04-28 18:40:04==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:40:04==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>1</appCode><errorMessage briefMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^" detailMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^"/></header><body><parameters></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:40:04==>DEBUG: 远程请求结束
+2017-04-28 18:40:04==>DEBUG: 开始解析XML
+2017-04-28 18:40:04==>DEBUG: 解析XML结束
+2017-04-28 18:40:04==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:40:04==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:40:04==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=6002^0010^7122^^20170428184004-0010-0009^0000^0010|姓名|现居住地址|体检档案
+编号|村民小组|外科|五官科|实验室检查|胸透|B超|心电图|医院专家结论建议|是否医保卡|内科|备注|^1^68F72884C749|80|^
+2017-04-28 18:40:04==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:40:04==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>1</appCode><errorMessage briefMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^" detailMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^"/></header><body><parameters></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:40:04==>DEBUG: 远程请求结束
+2017-04-28 18:40:04==>DEBUG: 开始解析XML
+2017-04-28 18:40:04==>DEBUG: 解析XML结束
+2017-04-28 18:40:04==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:40:04==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:40:04==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=6002^0010^7122^^20170428184004-0010-0010^0000^0010|姓名|现居住地址|体检档案
+编号|村民小组|外科|五官科|实验室检查|胸透|B超|心电图|医院专家结论建议|是否医保卡|内科|备注|^1^68F72884C749|80|^
+2017-04-28 18:40:04==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:40:04==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>1</appCode><errorMessage briefMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^" detailMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^"/></header><body><parameters></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:40:04==>DEBUG: 远程请求结束
+2017-04-28 18:40:04==>DEBUG: 开始解析XML
+2017-04-28 18:40:04==>DEBUG: 解析XML结束
+2017-04-28 18:40:05==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:40:05==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:40:05==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=6002^0010^7122^^20170428184004-0010-0011^0000^0010|姓名|现居住地址|体检档案
+编号|村民小组|外科|五官科|实验室检查|胸透|B超|心电图|医院专家结论建议|是否医保卡|内科|备注|^1^68F72884C749|80|^
+2017-04-28 18:40:05==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:40:05==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>1</appCode><errorMessage briefMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^" detailMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^"/></header><body><parameters></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:40:05==>DEBUG: 远程请求结束
+2017-04-28 18:40:05==>DEBUG: 开始解析XML
+2017-04-28 18:40:05==>DEBUG: 解析XML结束
+2017-04-28 18:40:05==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:40:05==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:40:05==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=6002^0010^7122^^20170428184005-0010-0012^0000^0010|姓名|现居住地址|体检档案
+编号|村民小组|外科|五官科|实验室检查|胸透|B超|心电图|医院专家结论建议|是否医保卡|内科|备注|^1^68F72884C749|80|^
+2017-04-28 18:40:05==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:40:05==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>1</appCode><errorMessage briefMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^" detailMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^"/></header><body><parameters></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:40:05==>DEBUG: 远程请求结束
+2017-04-28 18:40:05==>DEBUG: 开始解析XML
+2017-04-28 18:40:05==>DEBUG: 解析XML结束
+2017-04-28 18:40:05==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:40:05==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:40:05==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=6002^0010^7122^^20170428184005-0010-0013^0000^0010|姓名|现居住地址|体检档案
+编号|村民小组|外科|五官科|实验室检查|胸透|B超|心电图|医院专家结论建议|是否医保卡|内科|备注|^1^68F72884C749|80|^
+2017-04-28 18:40:05==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:40:05==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>1</appCode><errorMessage briefMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^" detailMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^"/></header><body><parameters></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:40:05==>DEBUG: 远程请求结束
+2017-04-28 18:40:05==>DEBUG: 开始解析XML
+2017-04-28 18:40:05==>DEBUG: 解析XML结束
+2017-04-28 18:40:05==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:40:05==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:40:05==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=6002^0010^7122^^20170428184005-0010-0014^0000^0010|姓名|现居住地址|体检档案
+编号|村民小组|外科|五官科|实验室检查|胸透|B超|心电图|医院专家结论建议|是否医保卡|内科|备注|^1^68F72884C749|80|^
+2017-04-28 18:40:05==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:40:05==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>1</appCode><errorMessage briefMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^" detailMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^"/></header><body><parameters></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:40:05==>DEBUG: 远程请求结束
+2017-04-28 18:40:05==>DEBUG: 开始解析XML
+2017-04-28 18:40:05==>DEBUG: 解析XML结束
+2017-04-28 18:40:05==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:40:05==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:40:05==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=6002^0010^7122^^20170428184005-0010-0015^0000^0010|姓名|现居住地址|体检档案
+编号|村民小组|外科|五官科|实验室检查|胸透|B超|心电图|医院专家结论建议|是否医保卡|内科|备注|^1^68F72884C749|80|^
+2017-04-28 18:40:05==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:40:05==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>1</appCode><errorMessage briefMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^" detailMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^"/></header><body><parameters></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:40:05==>DEBUG: 远程请求结束
+2017-04-28 18:40:05==>DEBUG: 开始解析XML
+2017-04-28 18:40:05==>DEBUG: 解析XML结束
+2017-04-28 18:40:05==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:40:05==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:40:05==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=6002^0010^7122^^20170428184005-0010-0016^0000^0010|姓名|现居住地址|体检档案
+编号|村民小组|外科|五官科|实验室检查|胸透|B超|心电图|医院专家结论建议|是否医保卡|内科|备注|^1^68F72884C749|80|^
+2017-04-28 18:40:05==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:40:05==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>1</appCode><errorMessage briefMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^" detailMessage="^^PRC_K_离退休体检结果上报时系统错误：ORA-01841: (full) year must be between -4713 and +9999, and not be 0^311100^"/></header><body><parameters></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:40:05==>DEBUG: 远程请求结束
+2017-04-28 18:40:05==>DEBUG: 开始解析XML
+2017-04-28 18:40:05==>DEBUG: 解析XML结束
+2017-04-28 18:40:07==>DEBUG: ----------------------------------------------------------------------
+2017-04-28 18:40:07==>DEBUG: 远程请求==>default：开始
+2017-04-28 18:40:07==>DEBUG: INPUT FROM CLIENT = 
+method=siInterface&busiType=1&cardFlag=&cardInfo=&inputData=9110^0010^7122^^20170428184007-0010-0017^0000^^1^68F72884C749|^
+2017-04-28 18:40:07==>DEBUG: 远程请求编码格式==>GBK
+2017-04-28 18:40:07==>DEBUG: OUTPUT FROM SERVER = 
+<reponseEnvelope><header><appCode>0</appCode><errorMessage briefMessage="" detailMessage=""/></header><body><parameters><parameter paraName="outputData" paraValue="20170428183630-00000010-4859^00000010-7122-201704281836304858^^"/><parameter paraName="writeCardInfo" paraValue=""/></parameters><dataStores></dataStores></body></reponseEnvelope>
+2017-04-28 18:40:07==>DEBUG: 远程请求结束
+2017-04-28 18:40:07==>DEBUG: 开始解析XML
+2017-04-28 18:40:07==>DEBUG: 解析XML结束

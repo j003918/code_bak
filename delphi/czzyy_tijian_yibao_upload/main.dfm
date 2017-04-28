@@ -20,6 +20,7 @@ object Form1: TForm1
     Top = 8
     Width = 497
     Height = 345
+    ColCount = 15
     TabOrder = 0
   end
   object ProgressBar1: TProgressBar
@@ -29,22 +30,13 @@ object Form1: TForm1
     Height = 17
     TabOrder = 1
   end
-  object btnLoad: TButton
-    Left = 320
-    Top = 376
-    Width = 75
-    Height = 25
-    Caption = #25968#25454#21152#36733
-    TabOrder = 2
-    OnClick = btnLoadClick
-  end
   object btnUpload: TButton
-    Left = 448
+    Left = 440
     Top = 376
     Width = 75
     Height = 25
     Caption = #25968#25454#19978#20256
-    TabOrder = 3
+    TabOrder = 2
     OnClick = btnUploadClick
   end
   object StatusBar1: TStatusBar
@@ -68,10 +60,28 @@ object Form1: TForm1
     Lines.Strings = (
       'Memo1')
     ScrollBars = ssBoth
+    TabOrder = 4
+  end
+  object Button1: TButton
+    Left = 240
+    Top = 376
+    Width = 75
+    Height = 25
+    Caption = #25968#25454#21152#36733
     TabOrder = 5
+    OnClick = Button1Click
   end
   object OpenDialog1: TOpenDialog
     Left = 640
     Top = 16
+  end
+  object XLS: TXLSReadWriteII5
+    ComponentVersion = '5.20.46'
+    Version = xvExcel2007
+    DirectRead = True
+    DirectWrite = False
+    OnReadCell = XLSReadCell
+    Left = 696
+    Top = 368
   end
 end

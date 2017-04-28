@@ -4,25 +4,31 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, ComObj, Grids, ComCtrls;
+  Dialogs, StdCtrls, ExtCtrls, ComObj, Grids, ComCtrls,
+    XLSComment5,
+  XLSDrawing5, Xc12Utils5, Xc12Manager5,
+  XLSReadWriteII5, XLSSheetData5;
 
 type
   TForm1 = class(TForm)
     OpenDialog1: TOpenDialog;
     StringGrid1: TStringGrid;
     ProgressBar1: TProgressBar;
-    btnLoad: TButton;
     btnUpload: TButton;
     StatusBar1: TStatusBar;
     Memo1: TMemo;
+    XLS: TXLSReadWriteII5;
+    Button1: TButton;
     procedure btnUploadClick(Sender: TObject);
-    procedure btnLoadClick(Sender: TObject);
+    //procedure btnLoadClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure Button1Click(Sender: TObject);
+    procedure XLSReadCell(ACell: TXLSEventCell);
   private
     { Private declarations }
 
-
+    function loadDateToList() : Integer;
     function buildCMD(p1,p7 :string;p2:string='0010';p3:string='7122';p6:string='0000';p4:string='';p8:string='1'):string;
   public
     { Public declarations }
@@ -50,15 +56,34 @@ begin
   result := p1 + '^' + p2 + '^' +p3 + '^' +p4 + '^' + p5 + '^' + p6 + '^' + p7 + '^' + p8 + '^';
 end;
 
+function TForm1.loadDateToList() : Integer;
+var
+  row,col : Integer;
+  str_data : string;
+begin
+  result := 1;
+  str_data := '';
+
+  g_list_err.Clear;
+  for Row := 1 to stringGrid1.RowCount-1 do begin
+    for Col := 0 to stringGrid1.ColCount-1 do begin
+        str_data := str_data + stringGrid1.Cells[col,row] + '|';
+    end;
+    g_list_data.Add(str_data);
+    str_data := '';
+  end;
+end;
+
 function UpLoadData(p: Pointer): Integer; stdcall;
 var
   ret,i : integer;
   str_in : string;
   str_out : array[0..2048] of Char;
 begin
-  g_list_data.Clear;
-  g_list_data.Text := g_list_err.Text;
+
   g_list_err.Clear;
+  g_list_data.Clear;
+  form1.loadDateToList();
 
   form1.ProgressBar1.Min := 0;
   form1.ProgressBar1.Max := g_list_data.Count;
@@ -82,101 +107,6 @@ begin
   form1.StatusBar1.Panels[1].Text := '上传结束！共'+inttostr(g_list_data.Count)+'条,失败'+inttostr(g_list_err.Count)+'条';
 
 end;
-
-function LoadData(p: Pointer): Integer; stdcall;
-var
-  ExcelApp :Variant;
-  i,j :integer;
-  lastrow,lastcol : integer;
-  str_tmp,str_data : string;
-begin
-  result := -1;
-
-  g_List_data.Clear;
-  g_list_err.Clear;
-
-  if form1.OpenDialog1.Execute then
-    form1.StatusBar1.Panels[0].Text := form1.OpenDialog1.FileName
-  else
-    exit;
-
-  ExcelApp := CreateOleObject('Excel.Application');
-  ExcelApp.WorkBooks.Open(form1.OpenDialog1.FileName);
-  ExcelApp.WorkSheets[1].Activate;
-
-  LastRow := ExcelApp.ActiveSheet.UsedRange.Rows.Count;
-  LastCol := ExcelApp.ActiveSheet.UsedRange.Columns.Count;
-
-  if LastCol < 16 then
-  begin
-    form1.StatusBar1.Panels[1].Text := '文件格式错误';
-    exit;
-  end;
-
-  form1.progressbar1.Min := 1;
-  form1.progressbar1.Max := LastRow;
-
-  form1.stringgrid1.RowCount := LastRow;
-  //form1.stringgrid1.ColCount := LastCol;
-  form1.stringgrid1.ColCount := 16;
-
-  form1.StatusBar1.Panels[1].Text := '数据加载中......';
-
-  //4	13	1	14	15	19	20	21	22	23	24	25	26	15
-  for i:=1 to lastrow do
-    begin
-       str_data := '';
-       str_tmp := ExcelApp.Cells[i,1].value;
-       if length(trim(str_tmp)) = 0 then continue;
-
-       if i = 1 then
-          form1.stringGrid1.Cells[0,i-1] := '医院编号'
-       else
-          form1.stringGrid1.Cells[0,i-1] :=  '0010';//ExcelApp.Cells[i,0].value;
-       form1.stringGrid1.Cells[1,i-1] :=  ExcelApp.Cells[i,4].value;
-       form1.stringGrid1.Cells[2,i-1] :=  ExcelApp.Cells[i,13].value;
-       form1.stringGrid1.Cells[3,i-1] :=  ExcelApp.Cells[i,1].value;
-       form1.stringGrid1.Cells[4,i-1] :=  ExcelApp.Cells[i,14].value;
-       form1.stringGrid1.Cells[5,i-1] :=  ExcelApp.Cells[i,15].value;
-       form1.stringGrid1.Cells[6,i-1] :=  ExcelApp.Cells[i,19].value;
-       form1.stringGrid1.Cells[7,i-1] :=  ExcelApp.Cells[i,20].value;
-       form1.stringGrid1.Cells[8,i-1] :=  ExcelApp.Cells[i,21].value;
-       form1.stringGrid1.Cells[9,i-1] :=  ExcelApp.Cells[i,22].value;
-       form1.stringGrid1.Cells[10,i-1] :=  ExcelApp.Cells[i,23].value;
-       form1.stringGrid1.Cells[11,i-1] :=  ExcelApp.Cells[i,24].value;
-       form1.stringGrid1.Cells[12,i-1] :=  ExcelApp.Cells[i,25].value;
-       form1.stringGrid1.Cells[13,i-1] :=  ExcelApp.Cells[i,26].value;
-       form1.stringGrid1.Cells[14,i-1] :=  ExcelApp.Cells[i,18].value;
-       form1.stringGrid1.Cells[15,i-1] :=  ExcelApp.Cells[i,27].value;
-
-       form1.progressbar1.Position := i;
-
-       for j:=0 to 15 do
-        begin
-          str_tmp := form1.stringGrid1.Cells[j,i-1];
-          str_data := str_data + trim(str_tmp) + '|';
-        end;
-        
-        if i > 1 then g_list_err.Add(str_data);
-
-      end;
-
-  form1.StatusBar1.Panels[1].Text := '数据加载完成';
-
-  ExcelApp.WorkBooks.Close;
-  ExcelApp.Quit;
-  ExcelApp := Unassigned;
-  Result := 0;
-end;
-
-
-procedure TForm1.btnLoadClick(Sender: TObject);
-var 
-  ID: THandle;
-begin
-  CreateThread(nil, 0, @LoadData, nil, 0, ID);
-end;
-
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
@@ -225,6 +155,100 @@ begin
   memo1.Clear ;
   memo1.Lines.Add('上传失败数据');
   CreateThread(nil, 0, @UpLoadData, TForm1, 0, ID);
+end;
+
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+  if OpenDialog1.Execute then
+  begin
+    StatusBar1.Panels[0].Text := OpenDialog1.FileName ;
+    XLS.Filename := OpenDialog1.FileName;
+  end
+  else
+    exit;
+  XLS.DirectRead := True;
+  stringgrid1.RowCount := 0;
+  stringgrid1.ColCount := 15;
+  XLS.Read;
+end;
+
+procedure TForm1.XLSReadCell(ACell: TXLSEventCell);
+begin
+  if (acell.Row mod 100) = 0 then begin
+    Application.ProcessMessages;
+  end;
+
+  form1.StatusBar1.Panels[1].Text := 'load '+intToStr(acell.Row) + ',' + intToStr(acell.Col);
+
+  stringgrid1.RowCount := acell.Row+1;
+
+  case acell.Col of
+    0:
+      begin
+        if acell.Row = 0  then
+          stringGrid1.Cells[0,acell.Row] := '医院编号'
+       else
+          stringGrid1.Cells[0,acell.Row] :=  '0010';
+      end;
+    4:
+      begin
+        stringGrid1.Cells[1,acell.Row] :=  acell.AsString;
+      end;
+    13:
+      begin
+        stringGrid1.Cells[2,acell.Row] :=  acell.AsString;
+      end;
+    1:
+      begin
+        stringGrid1.Cells[3,acell.Row] :=  acell.AsString;
+      end;
+    15:
+      begin
+        stringGrid1.Cells[4,acell.Row] :=  acell.AsString;
+      end;
+    19:
+      begin
+        stringGrid1.Cells[5,acell.Row] :=  acell.AsString;
+      end;
+    20:
+      begin
+        stringGrid1.Cells[6,acell.Row] :=  acell.AsString;
+      end;
+    21:
+      begin
+        stringGrid1.Cells[7,acell.Row] :=  acell.AsString;
+      end;
+    22:
+      begin
+        stringGrid1.Cells[8,acell.Row] :=  acell.AsString;
+      end;
+    23:
+      begin
+        stringGrid1.Cells[9,acell.Row] :=  acell.AsString;
+      end;
+    24:
+      begin
+        stringGrid1.Cells[10,acell.Row] :=  acell.AsString;
+      end;
+    25:
+      begin
+        stringGrid1.Cells[11,acell.Row] :=  acell.AsString;
+      end;
+    26:
+      begin
+        stringGrid1.Cells[12,acell.Row] :=  acell.AsString;
+      end;
+    18:
+      begin
+        stringGrid1.Cells[13,acell.Row] :=  acell.AsString;
+      end;
+    17:
+      begin
+        stringGrid1.Cells[14,acell.Row] :=  acell.AsString;
+      end;
+    else
+      begin   end;
+  end;
 end;
 
 end.
