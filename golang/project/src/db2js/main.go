@@ -1,3 +1,11 @@
+/* liteide *.env add ENV support oci8
+MINGW64=D:/mingw-w64/mingw64
+instantclient=D:/instantclient_12_2
+PKG_CONFIG_PATH=%instantclient%/pkg-config
+TNS_ADMIN=%instantclient%/network/admin
+PATH=%PATH%;%MINGW64%/bin;%GOROOT%/bin;%instantclient%;%instantclient%/pkg-config
+*/
+
 // db2js project main.go
 package main
 
@@ -5,7 +13,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
-	"database/sql"
 	"flag"
 	"fmt"
 	"net/http"
@@ -18,87 +25,22 @@ import (
 	"time"
 
 	"github.com/j003918/sql2json"
-
-	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/mattn/go-oci8"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 var (
-	db         *sql.DB
-	methodSql  map[string]string
 	cmdArgs    map[string]string
 	curReqNum  = 0
 	curReqLock sync.Mutex
 )
 
 func init() {
-	methodSql = make(map[string]string)
 	cmdArgs = make(map[string]string)
-
 	tls := flag.Int("tls", 0, "0:disable 1:enable")
 	port := flag.Int("port", 80, "http:80 https:443")
-	strConf := flag.String("conf", "config.txt", "")
-	strDBDriver := flag.String("dbdriver", "mysql", "mysql:oci8")
-	strDBHost := flag.String("dbhost", "127.0.0.1", "")
-	strDBPort := flag.String("dbport", "3306", "")
-	strDBUser := flag.String("dbuser", "root", "")
-	strDBPass := flag.String("dbpass", "root", "")
-	strDBName := flag.String("dbname", "mysql", "")
-	strDBCharset := flag.String("dbcharset", "utf8", "")
 	flag.Parse()
 
 	cmdArgs["tls"] = strconv.Itoa(*tls)
 	cmdArgs["port"] = strconv.Itoa(*port)
-	cmdArgs["conf"] = *strConf
-	cmdArgs["dbdriver"] = *strDBDriver
-	cmdArgs["dbhost"] = *strDBHost
-	cmdArgs["dbport"] = *strDBPort
-	cmdArgs["dbuser"] = *strDBUser
-	cmdArgs["dbpass"] = *strDBPass
-	cmdArgs["dbname"] = *strDBName
-	cmdArgs["dbcharset"] = *strDBCharset
-
-	update_config()
-	initDB()
-}
-
-/* liteide *.env add ENV support oci8
-MINGW64=D:/mingw-w64/mingw64
-instantclient=D:/instantclient_12_2
-PKG_CONFIG_PATH=%instantclient%/pkg-config
-TNS_ADMIN=%instantclient%/network/admin
-PATH=%PATH%;%MINGW64%/bin;%GOROOT%/bin;%instantclient%;%instantclient%/pkg-config
-*/
-func initDB() {
-	var err error
-
-	strDSN := ""
-	switch cmdArgs["dbdriver"] {
-	case "mysql":
-		strDSN += cmdArgs["dbuser"] + ":" + cmdArgs["dbpass"] //*str_DBPass
-		strDSN += "@tcp(" + cmdArgs["dbhost"] + ":" + cmdArgs["dbport"] + ")/"
-		strDSN += cmdArgs["dbname"] + "?charset=" + cmdArgs["dbcharset"]
-	case "oci8":
-		os.Setenv("NLS_LANG", "AMERICAN_AMERICA.AL32UTF8")
-		strDSN += cmdArgs["dbuser"] + "/" + cmdArgs["dbpass"] + "@" + cmdArgs["dbname"]
-	case "sqlite3":
-		strDSN += cmdArgs["dbname"]
-	default:
-	}
-
-	db, err = sql.Open(cmdArgs["dbdriver"], strDSN)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	db.SetMaxOpenConns(80)
-	db.SetMaxIdleConns(20)
-
-	err = db.Ping()
-	if err != nil {
-		panic(err.Error())
-	}
 }
 
 func main() {
@@ -109,11 +51,10 @@ func main() {
 		listen_addr += cmdArgs["port"]
 	}
 
-	defer db.Close()
-	go ReloadConfig(30)
+	stopChan := make(chan os.Signal)
+	signal.Notify(stopChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	http.Handle("/", http.FileServer(http.Dir("./html/")))
-
 	http.HandleFunc("/get", worker)
 
 	http.HandleFunc("/info/service", listMethod)
@@ -124,7 +65,7 @@ func main() {
 	http.HandleFunc("/cfg", setConfig)
 	http.HandleFunc("/m/del", delMethod)
 
-	s := &http.Server{
+	srv := &http.Server{
 		Addr:           listen_addr,
 		Handler:        http.DefaultServeMux,
 		ReadTimeout:    60 * time.Second,
@@ -134,20 +75,19 @@ func main() {
 
 	go func() {
 		if "1" == cmdArgs["tls"] {
-			fmt.Println(s.ListenAndServeTLS("./ca/ca.crt", "./ca/ca.key"))
+			fmt.Println(srv.ListenAndServeTLS("./ca/ca.crt", "./ca/ca.key"))
 		} else {
-			fmt.Println(s.ListenAndServe())
+			fmt.Println(srv.ListenAndServe())
 		}
-		fmt.Println("server shutdown")
 	}()
 
-	ch := make(chan os.Signal)
-	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
-	_ = <-ch
-	fmt.Println("server shutting down......")
-	//Wait gorotine print shutdown message
+	<-stopChan
+	fmt.Println("Shutting down server...")
+
 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	s.Shutdown(ctx)
+	srv.Shutdown(ctx)
+	CloseAll()
+
 	if nil != ctx.Err() {
 		fmt.Println(ctx.Err().Error())
 	}
@@ -167,16 +107,16 @@ func setConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 func delMethod(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	delete(methodSql, r.Form.Get("m"))
+	//r.ParseForm()
+	//delete(methodSql, r.Form.Get("m"))
 }
 
 func listMethod(w http.ResponseWriter, r *http.Request) {
-	strTmp := ""
-	for k, v := range methodSql {
-		strTmp += k + "{" + string('\n') + v + string('\n') + "}" + strings.Repeat(string('\n'), 2)
-	}
-	w.Write([]byte(strTmp))
+	//	strTmp := ""
+	//	for k, v := range methodSql {
+	//		strTmp += k + "{" + string('\n') + v + string('\n') + "}" + strings.Repeat(string('\n'), 2)
+	//	}
+	//	w.Write([]byte(strTmp))
 }
 
 func activeGuest(w http.ResponseWriter, r *http.Request) {
@@ -208,7 +148,14 @@ func worker(w http.ResponseWriter, r *http.Request) {
 	timeout := 30 * time.Second
 	r.ParseForm()
 	strCmd := r.Form.Get("m")
-	strSql := methodSql[strCmd]
+	strSql := ""
+	if MapMethod.Check(strCmd) {
+		strSql = MapMethod.Get(strCmd).(*MethdContent).Content
+	} else {
+		strJson := `{"result":"` + Code400 + `",` + `"msg":"` + Code400Msg + `", "data": null}`
+		w.Write([]byte(strJson))
+	}
+
 	for k, _ := range r.Form {
 		strSql = strings.Replace(strSql, "#"+k+"#", r.Form.Get(k), -1)
 	}
@@ -225,7 +172,7 @@ func worker(w http.ResponseWriter, r *http.Request) {
 		strVal = "null"
 	} else {
 		ctx, _ := context.WithTimeout(context.Background(), timeout)
-		err = sql2json.GetJson(ctx, db, strSql, &bufdata)
+		err = sql2json.GetJson(ctx, MapMethod.Get(strCmd).(*MethdContent).Mthdb, strSql, &bufdata)
 		if nil != err {
 			strRst = Code500
 			strMsg = err.Error()
@@ -247,12 +194,12 @@ func worker(w http.ResponseWriter, r *http.Request) {
 	}
 	json_buf.WriteString("}")
 
-	w.Header().Set("Connection", "close")
-	w.Header().Set("CharacterEncoding", "utf-8")
+	//w.Header().Set("Connection", "close")
+	//w.Header().Set("CharacterEncoding", "utf-8")
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Pragma", "no-cache")
-	w.Header().Set("Cache-Control", "no-cache, no-store, max-age=0")
-	w.Header().Set("Expires", "1L")
+	//w.Header().Set("Pragma", "no-cache")
+	//w.Header().Set("Cache-Control", "no-cache, no-store, max-age=0")
+	//w.Header().Set("Expires", "1L")
 
 	if strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") && json_buf.Len() >= 1024 {
 		var gzbuf bytes.Buffer

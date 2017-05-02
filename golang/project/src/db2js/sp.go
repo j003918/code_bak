@@ -2,6 +2,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 )
@@ -29,7 +30,7 @@ var (
 	ORACLE_SP_EXEC = `call SP_JHF_TEST_GOOCI8(:in1)`
 )
 
-func test_mysql_sp() {
+func test_mysql_sp(db *sql.DB) {
 	_, err := db.Exec(MYSQL_SP_DROP)
 	if err != nil {
 		panic(err.Error())
@@ -69,7 +70,7 @@ func test_mysql_sp() {
 	fmt.Println(out1, out2)
 }
 
-func test_oci8_sp() {
+func test_oci8_sp(db *sql.DB) {
 	db.Exec(ORACLE_SP_CREATE)
 	defer db.Exec(ORACLE_SP_DROP)
 
