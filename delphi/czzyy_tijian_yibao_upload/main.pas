@@ -18,17 +18,13 @@ type
     StatusBar1: TStatusBar;
     Memo1: TMemo;
     XLS: TXLSReadWriteII5;
-    Button1: TButton;
+    Button2: TButton;
     procedure btnUploadClick(Sender: TObject);
-    //procedure btnLoadClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure Button1Click(Sender: TObject);
-    procedure XLSReadCell(ACell: TXLSEventCell);
+    procedure Button2Click(Sender: TObject);
   private
     { Private declarations }
-
-    function loadDateToList() : Integer;
     function buildCMD(p1,p7 :string;p2:string='0010';p3:string='7122';p6:string='0000';p4:string='';p8:string='1'):string;
   public
     { Public declarations }
@@ -56,40 +52,23 @@ begin
   result := p1 + '^' + p2 + '^' +p3 + '^' +p4 + '^' + p5 + '^' + p6 + '^' + p7 + '^' + p8 + '^';
 end;
 
-function TForm1.loadDateToList() : Integer;
-var
-  row,col : Integer;
-  str_data : string;
-begin
-  result := 1;
-  str_data := '';
-
-  g_list_err.Clear;
-  for Row := 1 to stringGrid1.RowCount-1 do begin
-    for Col := 0 to stringGrid1.ColCount-1 do begin
-        str_data := str_data + stringGrid1.Cells[col,row] + '|';
-    end;
-    g_list_data.Add(str_data);
-    str_data := '';
-  end;
-end;
-
 function UpLoadData(p: Pointer): Integer; stdcall;
 var
   ret,i : integer;
   str_in : string;
   str_out : array[0..2048] of Char;
 begin
-
-  g_list_err.Clear;
   g_list_data.Clear;
-  form1.loadDateToList();
+  for i := 0 to g_list_err.Count-1 do
+  begin
+      g_list_data.Add(g_list_err[i]);
+  end;
+  g_list_err.Clear;
 
   form1.ProgressBar1.Min := 0;
   form1.ProgressBar1.Max := g_list_data.Count;
 
   result := 0;
-
   for i := 0 to g_list_data.Count-1 do
   begin
     form1.ProgressBar1.Position := i+1;
@@ -112,7 +91,6 @@ procedure TForm1.FormCreate(Sender: TObject);
 var
   str_out : array[0..2048] of Char;
   str_in : string;
-  //ret : integer;
 begin
 
   g_List_err := TStringList.Create;
@@ -130,7 +108,6 @@ begin
 
   INIT(str_out);
   str_in := buildCMD('9100','');
-  //ret :=
   BUSINESS_HANDLE(pchar(str_in),str_out) ;
 end;
 
@@ -138,10 +115,8 @@ procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
 var
   str_out : array[0..2048] of Char;
   str_in : string;
-  //ret : integer;
 begin
   str_in := buildCMD('9110','');
-  //ret :=
   BUSINESS_HANDLE(pchar(str_in),str_out) ;
 end;
 
@@ -157,98 +132,69 @@ begin
   CreateThread(nil, 0, @UpLoadData, TForm1, 0, ID);
 end;
 
-procedure TForm1.Button1Click(Sender: TObject);
+procedure TForm1.Button2Click(Sender: TObject);
+var
+  Row,Col,gridCol,i : Integer;
+  str_data,str_tmp : string;
 begin
-  if OpenDialog1.Execute then
+
+if OpenDialog1.Execute then
   begin
     StatusBar1.Panels[0].Text := OpenDialog1.FileName ;
     XLS.Filename := OpenDialog1.FileName;
   end
   else
     exit;
-  XLS.DirectRead := True;
-  stringgrid1.RowCount := 0;
-  stringgrid1.ColCount := 15;
+
+  g_list_err.Clear;
+  g_list_data.Clear;
+
   XLS.Read;
-end;
+  stringgrid1.RowCount := xls.Sheets[0].LastRow+1;
+  stringgrid1.ColCount := 15;
 
-procedure TForm1.XLSReadCell(ACell: TXLSEventCell);
-begin
-  if (acell.Row mod 100) = 0 then begin
-    Application.ProcessMessages;
-  end;
+  form1.StatusBar1.Panels[1].Text := '正在加载......';
 
-  form1.StatusBar1.Panels[1].Text := 'load '+intToStr(acell.Row) + ',' + intToStr(acell.Col);
+  str_tmp := '';
+  str_data := '';
 
-  stringgrid1.RowCount := acell.Row+1;
-
-  case acell.Col of
-    0:
-      begin
-        if acell.Row = 0  then
-          stringGrid1.Cells[0,acell.Row] := '医院编号'
+  for Row := 0 to xls.Sheets[0].LastRow do begin
+    for Col := 0 to xls.Sheets[0].LastCol do begin
+        if Row = 0  then
+          stringGrid1.Cells[0,Row] := '医院编号'
        else
-          stringGrid1.Cells[0,acell.Row] :=  '0010';
+          stringGrid1.Cells[0,Row] :=  '0010';
+
+          case col of
+            4  : gridCol := 1;
+            13 : gridCol := 2;
+            1  : gridCol := 3;
+            15 : gridCol := 4;
+            19 : gridCol := 5;
+            20 : gridCol := 6;
+            21 : gridCol := 7;
+            22 : gridCol := 8;
+            23 : gridCol := 9;
+            24 : gridCol := 10;
+            25 : gridCol := 11;
+            26 : gridCol := 12;
+            18 : gridCol := 13;
+            17 : gridCol := 14;
+            else gridCol := -1;
+          end;
+          if gridCol >0 then stringgrid1.Cells[gridCol,row] := xls.Sheets[0].AsString[col,row];
       end;
-    4:
+      if (Row mod 100) = 0 then Application.ProcessMessages;
+      if row >0 then
       begin
-        stringGrid1.Cells[1,acell.Row] :=  acell.AsString;
+        str_data := '';
+        for i := 0 to 14 do begin
+           str_data := str_data + form1.stringGrid1.Cells[i,row] + '|';
+        end;
+        g_List_err.Add(str_data);
       end;
-    13:
-      begin
-        stringGrid1.Cells[2,acell.Row] :=  acell.AsString;
-      end;
-    1:
-      begin
-        stringGrid1.Cells[3,acell.Row] :=  acell.AsString;
-      end;
-    15:
-      begin
-        stringGrid1.Cells[4,acell.Row] :=  acell.AsString;
-      end;
-    19:
-      begin
-        stringGrid1.Cells[5,acell.Row] :=  acell.AsString;
-      end;
-    20:
-      begin
-        stringGrid1.Cells[6,acell.Row] :=  acell.AsString;
-      end;
-    21:
-      begin
-        stringGrid1.Cells[7,acell.Row] :=  acell.AsString;
-      end;
-    22:
-      begin
-        stringGrid1.Cells[8,acell.Row] :=  acell.AsString;
-      end;
-    23:
-      begin
-        stringGrid1.Cells[9,acell.Row] :=  acell.AsString;
-      end;
-    24:
-      begin
-        stringGrid1.Cells[10,acell.Row] :=  acell.AsString;
-      end;
-    25:
-      begin
-        stringGrid1.Cells[11,acell.Row] :=  acell.AsString;
-      end;
-    26:
-      begin
-        stringGrid1.Cells[12,acell.Row] :=  acell.AsString;
-      end;
-    18:
-      begin
-        stringGrid1.Cells[13,acell.Row] :=  acell.AsString;
-      end;
-    17:
-      begin
-        stringGrid1.Cells[14,acell.Row] :=  acell.AsString;
-      end;
-    else
-      begin   end;
-  end;
+    end;
+    form1.StatusBar1.Panels[1].Text := '加载完成';
 end;
 
 end.

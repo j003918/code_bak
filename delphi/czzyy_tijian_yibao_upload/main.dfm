@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 282
-  Top = 193
-  Width = 928
+  Left = 155
+  Top = 132
+  Width = 1032
   Height = 480
   Caption = 'Form1'
   Color = clBtnFace
@@ -16,10 +16,10 @@ object Form1: TForm1
   PixelsPerInch = 96
   TextHeight = 13
   object StringGrid1: TStringGrid
-    Left = 8
+    Left = 6
     Top = 8
-    Width = 497
-    Height = 345
+    Width = 1003
+    Height = 185
     ColCount = 15
     TabOrder = 0
   end
@@ -31,8 +31,8 @@ object Form1: TForm1
     TabOrder = 1
   end
   object btnUpload: TButton
-    Left = 440
-    Top = 376
+    Left = 344
+    Top = 368
     Width = 75
     Height = 25
     Caption = #25968#25454#19978#20256
@@ -42,7 +42,7 @@ object Form1: TForm1
   object StatusBar1: TStatusBar
     Left = 0
     Top = 416
-    Width = 912
+    Width = 1016
     Height = 25
     Panels = <
       item
@@ -53,23 +53,23 @@ object Form1: TForm1
       end>
   end
   object Memo1: TMemo
-    Left = 512
-    Top = 8
-    Width = 385
-    Height = 345
+    Left = 8
+    Top = 208
+    Width = 1001
+    Height = 121
     Lines.Strings = (
       'Memo1')
     ScrollBars = ssBoth
     TabOrder = 4
   end
-  object Button1: TButton
-    Left = 240
-    Top = 376
+  object Button2: TButton
+    Left = 536
+    Top = 368
     Width = 75
     Height = 25
     Caption = #25968#25454#21152#36733
     TabOrder = 5
-    OnClick = Button1Click
+    OnClick = Button2Click
   end
   object OpenDialog1: TOpenDialog
     Left = 640
@@ -78,10 +78,9 @@ object Form1: TForm1
   object XLS: TXLSReadWriteII5
     ComponentVersion = '5.20.46'
     Version = xvExcel2007
-    DirectRead = True
+    DirectRead = False
     DirectWrite = False
-    OnReadCell = XLSReadCell
-    Left = 696
+    Left = 792
     Top = 368
   end
 end
