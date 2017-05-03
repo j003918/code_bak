@@ -103,7 +103,9 @@ func guestlogin(w http.ResponseWriter, r *http.Request) {
 	pass := r.FormValue("pass")
 
 	if !AddAuth(r.RemoteAddr, user, pass) {
-		w.Write([]byte("login error"))
+		w.Write([]byte("User Name or Password does not exist"))
+	} else {
+		w.Write([]byte("ok"))
 	}
 }
 

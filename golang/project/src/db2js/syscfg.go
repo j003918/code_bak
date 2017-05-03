@@ -209,29 +209,29 @@ func str2md5(str string) string {
 //SCUAdd table sys_user add new user
 func SCUAdd(id, pass string) bool {
 	mydb := MapDbDriver.Get(-1).(*sql.DB)
-	_, ok := ModifyTab(15, mydb, `insert into sys_user(id,pass) values(?,?)`, str2md5(id+pass))
-	return ok
+	rowCount, ok := ModifyTab(15, mydb, `insert into sys_user(id,pass) values(?,?)`, id, str2md5(id+pass))
+	return rowCount == 1 && ok
 }
 
 //SCUCheck table sys_user user login chek
 func SCUCheck(id, pass string) bool {
 	mydb := MapDbDriver.Get(-1).(*sql.DB)
-	_, ok := ModifyTab(15, mydb, `update sys_user set login_time=now() where id=? and pass=? and status=0`, id, str2md5(id+pass))
-	return ok
+	rowCount, ok := ModifyTab(15, mydb, `update sys_user set login_time=now() where id=? and pass=? and status=0`, id, str2md5(id+pass))
+	return (rowCount == 1) && ok
 }
 
 //SCUChangePass table sys_user change password
 func SCUChangePass(id, pass, newPass string) bool {
 	mydb := MapDbDriver.Get(-1).(*sql.DB)
-	_, ok := ModifyTab(15, mydb, `update sys_user set pass=? where id=? and pass=?`, str2md5(id+newPass), id, str2md5(id+pass))
-	return ok
+	rowCount, ok := ModifyTab(15, mydb, `update sys_user set pass=? where id=? and pass=?`, str2md5(id+newPass), id, str2md5(id+pass))
+	return rowCount == 1 && ok
 }
 
 //SCDAdd table sys_dsn add new dsn
 func SCDAdd(driver, dsn, info string) bool {
 	mydb := MapDbDriver.Get(-1).(*sql.DB)
-	_, ok := ModifyTab(15, mydb, `insert into sys_dsn(driver,dsn,info) values(?,?,?)`, driver, dsn, info)
-	return ok
+	rowCount, ok := ModifyTab(15, mydb, `insert into sys_dsn(driver,dsn,info) values(?,?,?)`, driver, dsn, info)
+	return rowCount == 1 && ok
 }
 
 //SCDSetDriver table sys_dsn set driver
@@ -244,6 +244,6 @@ func SCDSetDriver(driver, id string) bool {
 //SCDSetDSN table sys_dsn set dsn
 func SCDSetDSN(dsn, id string) bool {
 	mydb := MapDbDriver.Get(-1).(*sql.DB)
-	_, ok := ModifyTab(15, mydb, `update sys_dsn set dsn=? where id=?`, id)
-	return ok
+	rowCount, ok := ModifyTab(15, mydb, `update sys_dsn set dsn=? where id=?`, id)
+	return rowCount == 1 && ok
 }
