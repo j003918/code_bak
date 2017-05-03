@@ -37,10 +37,14 @@ func init() {
 	cmdArgs = make(map[string]string)
 	tls := flag.Int("tls", 0, "0:disable 1:enable")
 	port := flag.Int("port", 80, "http:80 https:443")
+	strdbdriver := flag.String("driver", "mysql", "")
+	strdsn := flag.String("dsn", `jhf:jhf@tcp(130.1.11.60:3306)/test?charset=utf8`, "")
 	flag.Parse()
 
 	cmdArgs["tls"] = strconv.Itoa(*tls)
 	cmdArgs["port"] = strconv.Itoa(*port)
+	cmdArgs["driver"] = *strdbdriver
+	cmdArgs["dsn"] = *strdsn
 }
 
 func main() {

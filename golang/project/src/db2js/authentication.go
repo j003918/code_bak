@@ -12,9 +12,9 @@ import (
 
 var (
 	//seconds
-	Check_Interval time.Duration = 3
+	Check_Interval time.Duration = 10
 	//seconds
-	KnockOutTime int64 = 60
+	KnockOutTime int64 = 60 * 60
 )
 
 var signMap *safemap.SafeMap
@@ -53,6 +53,7 @@ func genToken(guestIP, user string) (token string, ok bool) {
 	return hex.EncodeToString(byte_md5[:]), true
 }
 
+//AddAuth login.
 func AddAuth(guestIP, user, pass string) bool {
 	strSign, ok := genToken(guestIP, user)
 	if !ok {
@@ -71,6 +72,7 @@ func AddAuth(guestIP, user, pass string) bool {
 	return true
 }
 
+//CheckAuth
 func CheckAuth(guestIP, user string) bool {
 	strSign, ok := genToken(guestIP, user)
 	if !ok {
@@ -79,4 +81,14 @@ func CheckAuth(guestIP, user string) bool {
 
 	//return signMap.Check(strSign)
 	return signMap.CheckWithUpdate(strSign, time.Now().Unix())
+}
+
+//RemoveAuth logout.
+func RemoveAuth(guestIP, user string) {
+	strSign, ok := genToken(guestIP, user)
+	if !ok {
+		return
+	}
+
+	signMap.Del(strSign)
 }

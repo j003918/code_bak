@@ -56,7 +56,8 @@ type MethdContent struct {
 }
 
 func init() {
-	mydb, err := OpenDb(30, "mysql", `jhf:jhf@tcp(130.1.11.60:3306)/test?charset=utf8`, 80, 5)
+	//mydb, err := OpenDb(30, "mysql", `jhf:jhf@tcp(130.1.11.60:3306)/test?charset=utf8`, 80, 5)
+	mydb, err := OpenDb(30, cmdArgs["driver"], cmdArgs["dsn"], 80, 5)
 	if err != nil {
 		panic(err)
 	}
