@@ -2,8 +2,10 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/mattn/go-oci8"
@@ -20,9 +22,20 @@ func chekError(err error, output bool) bool {
 	return false
 }
 
-func OpenDb(driver, dsn string, maxOpen, maxIdle int) (*sql.DB, error) {
-	//mydb, err := sql.Open(driver, dsn)
+func OpenDb(timeout time.Duration, driver, dsn string, maxOpen, maxIdle int) (*sql.DB, error) {
+	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
+	mydb, err := _openDb(driver, dsn, maxOpen, maxIdle)
 
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	default:
+	}
+
+	return mydb, err
+}
+
+func _openDb(driver, dsn string, maxOpen, maxIdle int) (*sql.DB, error) {
 	mydb, err := sql.Open(driver, dsn)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -41,81 +54,45 @@ func OpenDb(driver, dsn string, maxOpen, maxIdle int) (*sql.DB, error) {
 	return mydb, err
 }
 
-func GetTabRows(mydb *sql.DB, rows *sql.Rows, strsql string, args ...interface{}) error {
-	stmt, err := mydb.Prepare(strsql)
-	if err != nil {
-		return err
-	}
-
-	rows, err = stmt.Query(args...)
-	return err
-
-}
-
-func PrinTab(mydb *sql.DB, strsql string, args ...interface{}) {
-	stmt, err := mydb.Prepare(strsql)
-	if chekError(err, true) {
-		return
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(args...)
-	if chekError(err, true) {
-		return
-	}
-
-	columns, err := rows.Columns()
-	if chekError(err, true) {
-		return
-	}
-	defer rows.Close()
-
-	//fix bug time.Time nil
-	//values := make([]sql.RawBytes, len(columns))
-	values := make([]sql.NullString, len(columns))
-	scans := make([]interface{}, len(columns))
-
-	for i := range values {
-		scans[i] = &values[i]
-	}
-
-	for rows.Next() {
-		err = rows.Scan(scans...)
-		if chekError(err, true) {
-			return
-		}
-
-		strVal := ""
-		for _, col := range values {
-			if !col.Valid {
-				strVal = "NULL"
-			} else {
-				strVal = col.String
-			}
-			fmt.Printf(strVal, " ")
-		}
-		fmt.Println()
-	}
-}
-
 //for insert update delete use
-func ModifyTab(mydb *sql.DB, strsql string, args ...interface{}) (RowsAffected int64, ok bool) {
-	stmt, err := mydb.Prepare(strsql)
-	if chekError(err, true) {
-		return -1, false
-	}
-	defer stmt.Close()
+func ModifyTab(timeout time.Duration, mydb *sql.DB, strsql string, args ...interface{}) (RowsAffected int64, ok bool) {
+	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
+	rowCount, ok := _modifyTab(mydb, strsql, args...)
 
-	rst, err := stmt.Exec(args...)
-	if chekError(err, true) {
+	select {
+	case <-ctx.Done():
 		return -1, false
+	default:
+	}
+	return rowCount, ok
+}
+
+func _modifyTab(mydb *sql.DB, strsql string, args ...interface{}) (RowsAffected int64, ok bool) {
+	rst, err := mydb.Exec(strsql, args...)
+	if err != nil {
+		return 0, false
 	}
 
-	count, err := rst.RowsAffected()
-	if chekError(err, true) {
-		return -1, false
-	}
+	rowCount, _ := rst.RowsAffected()
+	return rowCount, true
+	/*
+		stmt, err := mydb.Prepare(strsql)
+		if chekError(err, true) {
+			return -1, false
+		}
+		defer stmt.Close()
 
-	stmt.Close()
-	return count, true
+		rst, err := stmt.Exec(args...)
+		if chekError(err, true) {
+			return -1, false
+		}
+
+		count, err := rst.RowsAffected()
+		if chekError(err, true) {
+			return -1, false
+		}
+
+		stmt.Close()
+		return count, true
+	*/
 }
