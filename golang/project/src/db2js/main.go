@@ -94,7 +94,13 @@ func main() {
 }
 
 func guestlogin(w http.ResponseWriter, r *http.Request) {
-	AddAuth(r.Host, "")
+	r.ParseForm()
+	user := r.FormValue("user")
+	pass := r.FormValue("pass")
+
+	if !AddAuth(r.RemoteAddr, user, pass) {
+		w.Write([]byte("login error"))
+	}
 }
 
 func setConfig(w http.ResponseWriter, r *http.Request) {
@@ -139,14 +145,19 @@ func decGuest() {
 func worker(w http.ResponseWriter, r *http.Request) {
 	incGuest()
 	defer decGuest()
-	if !CheckAuth(r.Host, "") {
+	r.ParseForm()
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	user := r.Form.Get("user")
+	//user := r.Header.Get("x-auth-user")
+
+	if !CheckAuth(r.RemoteAddr, user) {
 		strJson := `{"result":"` + Code401 + `",` + `"msg":"` + Code401Msg + `", "data": null}`
 		w.Write([]byte(strJson))
 		return
 	}
 
 	timeout := 30 * time.Second
-	r.ParseForm()
 	strCmd := r.Form.Get("m")
 	strSql := ""
 	if MapMethod.Check(strCmd) {
@@ -154,6 +165,7 @@ func worker(w http.ResponseWriter, r *http.Request) {
 	} else {
 		strJson := `{"result":"` + Code400 + `",` + `"msg":"` + Code400Msg + `", "data": null}`
 		w.Write([]byte(strJson))
+		return
 	}
 
 	for k, _ := range r.Form {
@@ -196,7 +208,7 @@ func worker(w http.ResponseWriter, r *http.Request) {
 
 	//w.Header().Set("Connection", "close")
 	//w.Header().Set("CharacterEncoding", "utf-8")
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	//w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	//w.Header().Set("Pragma", "no-cache")
 	//w.Header().Set("Cache-Control", "no-cache, no-store, max-age=0")
 	//w.Header().Set("Expires", "1L")

@@ -1,9 +1,3 @@
-<!DOCTYPE HTML> 
-<html> 
-<head> 
-<meta charset="UTF-8" /> 
-<title>Login</title> 
-<style> 
 html {
     background-color: #E9EEF0
 }
@@ -16,7 +10,7 @@ html {
     border: 1px solid #BfD6E1;
     border-radius: 5px;
     color: #444;
-    font: 14px 'Microsoft YaHei','微软雅黑';
+    font: 14px 'Microsoft YaHei','΢���ź�';
     margin: 0 auto;
     width: 388px
 }
@@ -41,7 +35,7 @@ html {
     border: 1px solid #D2D9dC;
     border-radius: 2px;
     color: #444;
-    font: 12px 'Microsoft YaHei','微软雅黑';
+    font: 12px 'Microsoft YaHei','΢���ź�';
     padding: 8px 14px;
     margin-bottom: 8px;
     width: 310px;
@@ -81,25 +75,3 @@ html {
 .loginBox label[for="remember"] {
     font: 11px Arial;
 }
-</style> 
-</head> 
-<body> 
-<div class="wrapper">
-    <form action="/auth/login" method="post" >
-    <div class="loginBox">
-        <div class="loginBoxCenter">
-            <p><label for="username">用户名：</label></p>
-            <p><input type="text" id="email" name="user" class="loginInput" autofocus="autofocus" required="required" autocomplete="off" placeholder="请输入用户名" value="" /></p>
-            <p><label for="password">密  码：</label><!--<a class="forgetLink" href="#">忘记密码?</a>--></p>
-            <p><input type="password" id="password" name="pass" class="loginInput" required="required" placeholder="请输入密码" value="" /></p>
-        </div>
-        <div class="loginBoxButtons">
-           <!-- <input id="remember" type="checkbox" name="remember" />
-            <label for="remember">记住登录状态</label>-->
-            <button class="loginBtn">登录</button>
-        </div>
-    </div>
-    </form>
-</div>
-</body> 
-</html> 

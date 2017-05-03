@@ -14,7 +14,7 @@ var (
 	//seconds
 	Check_Interval time.Duration = 3
 	//seconds
-	KnockTimeOut int64 = 15
+	KnockOutTime int64 = 60
 )
 
 var signMap *safemap.SafeMap
@@ -33,7 +33,7 @@ func init() {
 }
 
 func loop(val interface{}) bool {
-	if time.Now().Unix()-val.(int64) >= KnockTimeOut {
+	if time.Now().Unix()-val.(int64) >= KnockOutTime {
 		return true
 	}
 	return false
@@ -53,11 +53,20 @@ func genToken(guestIP, user string) (token string, ok bool) {
 	return hex.EncodeToString(byte_md5[:]), true
 }
 
-func AddAuth(guestIP, user string) bool {
+func AddAuth(guestIP, user, pass string) bool {
 	strSign, ok := genToken(guestIP, user)
 	if !ok {
 		return false
 	}
+
+	if signMap.Check(strSign) {
+		return true
+	}
+
+	if !SCUCheck(user, pass) {
+		return false
+	}
+
 	signMap.Set(strSign, time.Now().Unix())
 	return true
 }
@@ -67,6 +76,7 @@ func CheckAuth(guestIP, user string) bool {
 	if !ok {
 		return false
 	}
+
 	//return signMap.Check(strSign)
 	return signMap.CheckWithUpdate(strSign, time.Now().Unix())
 }

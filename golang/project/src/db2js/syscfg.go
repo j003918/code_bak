@@ -12,44 +12,44 @@ import (
 )
 
 var (
-	sysconfigDbName = "bdgfcsys"
-	MapDbDriver     *safemap.SafeMap
-	MapMethod       *safemap.SafeMap
+	//sysconfigDbName = "bdgfcsys"
+	MapDbDriver *safemap.SafeMap
+	MapMethod   *safemap.SafeMap
 
 	SysTabCreate_sys_user = `		
-		CREATE TABLE IF NOT EXISTS [sys_user] 
+		CREATE TABLE IF NOT EXISTS sys_user 
 		(
-    		[id]			NVARCHAR2(128) PRIMARY KEY NOT NULL, 
-    		[pass]			NVARCHAR2(128) NOT NULL, 
-			[sign]			VARCHAR2(32) NOT NULL DEFAULT "*", 
-    		[trustzone] 	VARCHAR2(1024) NOT NULL DEFAULT "*", 
-    		[status]		INTEGER NOT NULL DEFAULT 0, 
-    		[login_time]	DATETIME NOT NULL DEFAULT (DATETIME ('now', 'localtime')), 
-    		[create_time]	DATETIME NOT NULL DEFAULT (DATETIME ('now', 'localtime'))
+			id 			VARCHAR(24) PRIMARY KEY NOT NULL,     
+    		pass		VARCHAR(128) NOT NULL, 
+			sign		VARCHAR(32) DEFAULT NULL, 
+    		trustzone 	VARCHAR(128) DEFAULT NULL, 
+    		status		INTEGER NOT NULL DEFAULT 0, 
+    		login_time	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+    		create_time	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);`
 
 	SysTabCreate_sys_dsn = `		
-		CREATE TABLE IF NOT EXISTS [sys_dsn] 
+		CREATE TABLE IF NOT EXISTS sys_dsn 
 		(
-			[id]		INTEGER PRIMARY KEY AUTOINCREMENT,
-    		[driver]	CHAR(64) NOT NULL, 
-    		[dsn] 		NVARCHAR2(256) NOT NULL,
-			[status] 	INTEGER NOT NULL DEFAULT 0,
-			[info]		NVARCHAR2(64)
+			id		INTEGER PRIMARY KEY AUTO_INCREMENT,
+    		driver	VARCHAR(64) NOT NULL, 
+    		dsn		VARCHAR(128) NOT NULL,
+			status 	INTEGER NOT NULL DEFAULT 0,
+			info	VARCHAR(64)
 		);`
 
 	SysTabCreate_sys_method = `		
-		CREATE TABLE IF NOT EXISTS [sys_method] 
+		CREATE TABLE IF NOT EXISTS sys_method 
 		(
-			[method]		VARCHAR2(128) PRIMARY KEY NOT NULL, 
-    		[content]		NVARCHAR2(1024) NOT NULL, 
-    		[dsn_id]		INTEGER NOT NULL, 
-    		[update_time]	DATETIME NOT NULL DEFAULT (DATETIME ('now', 'localtime')), 
-    		[create_time]	DATETIME NOT NULL DEFAULT (DATETIME ('now', 'localtime'))
+			method	VARCHAR(128) PRIMARY KEY NOT NULL, 
+    		content		VARCHAR(128) NOT NULL, 
+    		dsn_id	INTEGER NOT NULL, 
+    		update_time	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+    		create_time	DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 		);`
 
 	sysTab_sys_user_queryAll       = `select * from sys_user`
-	sysTab_sys_user_add            = `insert into sys_user(id,pass) values(?,?)`
+	sysTab_sys_user_add            = `insert into sys_user(id,pass) values(?,?);`
 	sysTab_sys_user_set_login_time = `update sys_user set login_time=DATETIME('now', 'localtime') where user_id=? and user_pass=?`
 	sysTab_sys_user_set_pass       = `update sys_user set pass=? where id=? and pass=?`
 
@@ -72,7 +72,7 @@ type MethdContent struct {
 }
 
 func init() {
-	mydb, err := OpenDb("sqlite3", sysconfigDbName)
+	mydb, err := OpenDb("mysql", `jhf:jhf@tcp(130.1.11.60:3306)/test?charset=utf8`, 5, 2)
 	if err != nil {
 		panic(err)
 	}
@@ -92,8 +92,7 @@ func loopMethod(v interface{}) bool {
 }
 
 func loopDb(v interface{}) bool {
-	//mydb := v.(*MethdContent).Mthdb
-	//mydb.Close()
+	v.(*sql.DB).Close()
 	return true
 }
 
@@ -146,7 +145,7 @@ func setupDriver() {
 		}
 
 		if !MapDbDriver.Check(id) {
-			newdb, err := OpenDb(driver, dsn)
+			newdb, err := OpenDb(driver, dsn, 80, 5)
 			if err == nil {
 				MapDbDriver.Set(id, newdb)
 				//fmt.Println("load db driver ", id, driver, dsn)
@@ -181,11 +180,11 @@ func setupMethod() {
 		}
 
 		if !MapMethod.Check(method) {
-			mc := new(MethdContent)
+			mc := MethdContent{Method: "", Content: "", Mthdb: nil}
 			mc.Method = method
 			mc.Content = content
 			mc.Mthdb = MapDbDriver.Get(dsn_id).(*sql.DB)
-			MapMethod.Set(method, mc)
+			MapMethod.Set(method, &mc)
 			fmt.Println("load method ", method)
 		}
 	}
@@ -196,14 +195,20 @@ func initSysDB(mydb *sql.DB) {
 	ModifyTab(mydb, SysTabCreate_sys_dsn)
 	ModifyTab(mydb, SysTabCreate_sys_method)
 
-	ModifyTab(mydb, sysTab_sys_user_add, "admin", str2md5("admin"+"czzyy_123"))
+	//fmt.Println("add ModifyTab ok1")
 
-	ModifyTab(mydb, sysTab_sys_dsn_add, "sqlite3", sysconfigDbName, "sysconfig db")
+	ModifyTab(mydb, sysTab_sys_user_add, "admin", str2md5("admin"+"czzyy_123"))
+	ModifyTab(mydb, sysTab_sys_user_add, "jhf", str2md5("jhf"+"jhf"))
+	ModifyTab(mydb, sysTab_sys_user_add, "tf", str2md5("tf"+"tf"))
+	//fmt.Println("add ModifyTab ok2")
+
+	//ModifyTab(mydb, sysTab_sys_dsn_add, "sqlite3", sysconfigDbName, "sysconfig db")
+	ModifyTab(mydb, sysTab_sys_dsn_add, "mysql", `jhf:jhf@tcp(130.1.11.60:3306)/test?charset=utf8`, "60")
 	ModifyTab(mydb, sysTab_sys_dsn_add, "oci8", `system/manager@his`, "his")
 	ModifyTab(mydb, sysTab_sys_dsn_add, "mysql", `root:root@tcp(172.25.125.101:3306)/oa0618?charset=utf8`, "oa")
 	ModifyTab(mydb, sysTab_sys_dsn_add, "mysql", `root:root@tcp(130.1.10.230:3306)/zyyoutdoor?charset=utf8`, "zyyoutdoor")
 
-	ModifyTab(mydb, sysTab_sys_method_add, "sysuser", `select * from sys_user`, 1)
+	ModifyTab(mydb, sysTab_sys_method_add, "sysuser", `select * from lis01`, 1)
 	ModifyTab(mydb, sysTab_sys_method_add, "hisalluser", `select * from staff_dict`, 2)
 	ModifyTab(mydb, sysTab_sys_method_add, "hisuser", `select * from staff_dict where user_name='#un#'`, 2)
 }
@@ -220,8 +225,20 @@ func SCUAdd(mydb *sql.DB, id, pass string) bool {
 }
 
 //SCUCheck table sys_user user login chek
-func SCUCheck(mydb *sql.DB, id, pass string) bool {
-	count, ok := ModifyTab(mydb, sysTab_sys_user_set_login_time, id, str2md5(id+pass))
+func SCUCheck(id, pass string) bool {
+	if !MapDbDriver.Check(1) {
+		return false
+	}
+
+	//`update sys_user set login_time=DATETIME('now', 'localtime') where id=? and pass=? and status=0`
+
+	/*mydb, err := OpenDb("sqlite3", sysconfigDbName)
+	if err != nil {
+		panic(err)
+	}
+	defer mydb.Close()
+	*/
+	count, ok := ModifyTab(MapDbDriver.Get(1).(*sql.DB), `update sys_user set login_time=now() where id=? and pass=? and status=0`, id, str2md5(id+pass))
 	return ok && count == 1
 }
 

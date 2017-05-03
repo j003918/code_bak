@@ -20,7 +20,7 @@ func chekError(err error, output bool) bool {
 	return false
 }
 
-func OpenDb(driver, dsn string) (*sql.DB, error) {
+func OpenDb(driver, dsn string, maxOpen, maxIdle int) (*sql.DB, error) {
 	//mydb, err := sql.Open(driver, dsn)
 
 	mydb, err := sql.Open(driver, dsn)
@@ -29,8 +29,8 @@ func OpenDb(driver, dsn string) (*sql.DB, error) {
 		return nil, err
 	}
 
-	mydb.SetMaxOpenConns(80)
-	//mydb.SetMaxIdleConns(20)
+	mydb.SetMaxOpenConns(maxOpen)
+	mydb.SetMaxIdleConns(maxIdle)
 
 	err = mydb.Ping()
 	if err != nil {
@@ -116,5 +116,6 @@ func ModifyTab(mydb *sql.DB, strsql string, args ...interface{}) (RowsAffected i
 		return -1, false
 	}
 
+	stmt.Close()
 	return count, true
 }
