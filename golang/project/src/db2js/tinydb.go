@@ -9,7 +9,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/mattn/go-oci8"
-	_ "github.com/mattn/go-sqlite3"
+	//_ "github.com/mattn/go-sqlite3"
 )
 
 func chekError(err error, output bool) bool {
@@ -75,24 +75,4 @@ func _modifyTab(mydb *sql.DB, strsql string, args ...interface{}) (RowsAffected 
 
 	rowCount, _ := rst.RowsAffected()
 	return rowCount, true
-	/*
-		stmt, err := mydb.Prepare(strsql)
-		if chekError(err, true) {
-			return -1, false
-		}
-		defer stmt.Close()
-
-		rst, err := stmt.Exec(args...)
-		if chekError(err, true) {
-			return -1, false
-		}
-
-		count, err := rst.RowsAffected()
-		if chekError(err, true) {
-			return -1, false
-		}
-
-		stmt.Close()
-		return count, true
-	*/
 }

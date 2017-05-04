@@ -44,12 +44,14 @@ func (sm *SafeMap) Del(key interface{}) {
 	sm.lock.Unlock()
 }
 
-func (sm *SafeMap) LoopDel(loop func(val interface{}) bool) {
+func (sm *SafeMap) LoopDel(isDel func(k, v interface{}) bool) {
+	sm.lock.Lock()
 	for k, v := range sm.mp {
-		if loop(v) {
+		if isDel(k, v) {
 			sm.Del(k)
 		}
 	}
+	sm.lock.Unlock()
 }
 
 func (sm *SafeMap) Check(key interface{}) bool {

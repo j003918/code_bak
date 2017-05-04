@@ -123,7 +123,14 @@ func delMethod(w http.ResponseWriter, r *http.Request) {
 	//delete(methodSql, r.Form.Get("m"))
 }
 
+func isLoop(k, v interface{}) bool {
+	fmt.Println(k.(string))
+	return false
+}
+
 func listMethod(w http.ResponseWriter, r *http.Request) {
+	//signMap.Loop(isLoop)
+
 	//	strTmp := ""
 	//	for k, v := range methodSql {
 	//		strTmp += k + "{" + string('\n') + v + string('\n') + "}" + strings.Repeat(string('\n'), 2)

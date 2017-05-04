@@ -66,17 +66,17 @@ func init() {
 	MapMethod = safemap.NewSafeMap()
 	MapDbDriver.Set(-1, mydb)
 
-	setupSysTab(mydb)
+	//setupSysTab(mydb)
 
 	go reloadDriver(30)
 	go reloadMethod(15)
 }
 
-func loopMethod(v interface{}) bool {
+func loopMethod(k, v interface{}) bool {
 	return true
 }
 
-func loopDb(v interface{}) bool {
+func loopDb(k, v interface{}) bool {
 	v.(*sql.DB).Close()
 	return true
 }
@@ -196,7 +196,7 @@ func setupSysTab(mydb *sql.DB) {
 	SCDAdd("mysql", `root:root@tcp(130.1.10.230:3306)/zyyoutdoor?charset=utf8`, "zyyoutdoor")
 
 	//add test method
-	ModifyTab(15, mydb, `insert into sys_method(method,content,dsn_id) values(?,?,?)`, "sysuser", `select * from lis_01`, 1)
+	ModifyTab(15, mydb, `insert into sys_method(method,content,dsn_id) values(?,?,?)`, "lis", `select * from mlink.lis01`, 1)
 	ModifyTab(15, mydb, `insert into sys_method(method,content,dsn_id) values(?,?,?)`, "hisalluser", `select * from staff_dict`, 2)
 	ModifyTab(15, mydb, `insert into sys_method(method,content,dsn_id) values(?,?,?)`, "hisuser", `select * from staff_dict where user_name='#un#'`, 2)
 }

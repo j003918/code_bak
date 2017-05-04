@@ -32,8 +32,8 @@ func init() {
 	}()
 }
 
-func loop(val interface{}) bool {
-	if time.Now().Unix()-val.(int64) >= KnockOutTime {
+func loop(k, v interface{}) bool {
+	if time.Now().Unix()-v.(int64) >= KnockOutTime {
 		return true
 	}
 	return false
@@ -78,7 +78,6 @@ func CheckAuth(guestIP, user string) bool {
 	if !ok {
 		return false
 	}
-
 	//return signMap.Check(strSign)
 	return signMap.CheckWithUpdate(strSign, time.Now().Unix())
 }
