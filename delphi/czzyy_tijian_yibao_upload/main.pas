@@ -151,7 +151,7 @@ if OpenDialog1.Execute then
 
   XLS.Read;
   stringgrid1.RowCount := xls.Sheets[0].LastRow+1;
-  stringgrid1.ColCount := 15;
+ // stringgrid1.ColCount := 16;
 
   form1.StatusBar1.Panels[1].Text := '正在加载......';
 
@@ -159,7 +159,7 @@ if OpenDialog1.Execute then
   str_data := '';
 
   for Row := 0 to xls.Sheets[0].LastRow do begin
-    for Col := 0 to xls.Sheets[0].LastCol do begin
+    for Col := 0 to xls.Sheets[0].LastCol+1 do begin
         if Row = 0  then
           stringGrid1.Cells[0,Row] := '医院编号'
        else
@@ -169,26 +169,28 @@ if OpenDialog1.Execute then
             4  : gridCol := 1;
             13 : gridCol := 2;
             1  : gridCol := 3;
-            15 : gridCol := 4;
-            19 : gridCol := 5;
-            20 : gridCol := 6;
-            21 : gridCol := 7;
-            22 : gridCol := 8;
-            23 : gridCol := 9;
-            24 : gridCol := 10;
-            25 : gridCol := 11;
-            26 : gridCol := 12;
-            18 : gridCol := 13;
-            17 : gridCol := 14;
+            14 : gridCol := 4;
+            15 : gridCol := 5;
+            19 : gridCol := 6;
+            20 : gridCol := 7;
+            21 : gridCol := 8;
+            22 : gridCol := 9;
+            23 : gridCol := 10;
+            24 : gridCol := 11;
+            25 : gridCol := 12;
+            26 : gridCol := 13;
+            18 : gridCol := 14;
+            27 : gridCol := 15;
+            //27 : gridCol := 16;
             else gridCol := -1;
           end;
-          if gridCol >0 then stringgrid1.Cells[gridCol,row] := xls.Sheets[0].AsString[col,row];
+          if gridCol >0 then stringgrid1.Cells[gridCol,row] := xls.Sheets[0].AsString[col-1,row];
       end;
       if (Row mod 100) = 0 then Application.ProcessMessages;
       if row >0 then
       begin
         str_data := '';
-        for i := 0 to 14 do begin
+        for i := 0 to 15 do begin
            str_data := str_data + form1.stringGrid1.Cells[i,row] + '|';
         end;
         g_List_err.Add(str_data);

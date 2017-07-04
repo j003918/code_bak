@@ -1,7 +1,7 @@
 object Form1: TForm1
   Left = 155
   Top = 132
-  Width = 1032
+  Width = 1126
   Height = 480
   Caption = 'Form1'
   Color = clBtnFace
@@ -18,9 +18,9 @@ object Form1: TForm1
   object StringGrid1: TStringGrid
     Left = 6
     Top = 8
-    Width = 1003
+    Width = 1099
     Height = 185
-    ColCount = 15
+    ColCount = 16
     TabOrder = 0
   end
   object ProgressBar1: TProgressBar
@@ -42,7 +42,7 @@ object Form1: TForm1
   object StatusBar1: TStatusBar
     Left = 0
     Top = 416
-    Width = 1016
+    Width = 1110
     Height = 25
     Panels = <
       item
