@@ -151,7 +151,7 @@ if OpenDialog1.Execute then
 
   XLS.Read;
   stringgrid1.RowCount := xls.Sheets[0].LastRow+1;
- // stringgrid1.ColCount := 16;
+  stringgrid1.ColCount := 16;
 
   form1.StatusBar1.Panels[1].Text := 'ÕýÔÚ¼ÓÔØ......';
 
@@ -181,7 +181,6 @@ if OpenDialog1.Execute then
             26 : gridCol := 13;
             18 : gridCol := 14;
             27 : gridCol := 15;
-            //27 : gridCol := 16;
             else gridCol := -1;
           end;
           if gridCol >0 then stringgrid1.Cells[gridCol,row] := xls.Sheets[0].AsString[col-1,row];
